@@ -1,0 +1,81 @@
+/* ===== 1. RESET GLOBAL ===== */
+/* Menghilangkan margin/padding bawaan browser agar layout presisi */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== 2. ROOT & LAYOUT ===== */
+html, body {
+  width: 100%;
+  /* PENTING: Gunakan min-height agar scroll window terdeteksi oleh React */
+  min-height: 100vh; 
+  
+  /* Mencegah scroll horizontal (samping) yang merusak tampilan */
+  overflow-x: hidden; 
+  
+  background-color: #ffffff;
+  color: #1a1a1a;
+  
+  /* Font utama SULSELGO */
+  font-family: 'Poppins', sans-serif;
+  
+  /* Agar pergerakan scroll lebih halus saat klik menu navigasi */
+  scroll-behavior: smooth;
+  
+  /* Menghilangkan seleksi warna biru di mobile */
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  width: 100%;
+  /* Menjamin container utama selalu setinggi layar minimal */
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== 3. CUSTOM SCROLLBAR (Opsional - Gaya Maroon) ===== */
+/* Agar scrollbar di samping terlihat lebih estetik sesuai tema SULSELGO */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #800000; /* Warna Maroon SULSELGO */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #600000; /* Warna lebih gelap saat disentuh */
+}
+
+/* ===== 4. SELECTION STYLE ===== */
+/* Warna saat user memblok teks di website kamu */
+::selection {
+  background-color: #800000;
+  color: #ffffff;
+}
+
+/* ===== 5. UTILITY CLASSES (Tambahan Umum) ===== */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
