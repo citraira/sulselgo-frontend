@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+
 const DetailPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -683,9 +684,10 @@ const handleSimpanEdit = async () => {
 
               <div
                 style={{
-                  display: "flex",
+                  display: "grid",
+                  gridTemplateColumns:
+                    window.innerWidth <= 768 ? "1fr 1fr" : "repeat(auto-fill, minmax(220px, 1fr))",
                   gap: "10px",
-                  flexWrap: "wrap"
                 }}
               >
                 {galeri.map((foto, index) => (
@@ -700,7 +702,7 @@ const handleSimpanEdit = async () => {
                     }}
                     style={{
                       width: "220px",
-                      height: "150px",
+                      height: window.innerWidth <= 768 ? "120px" : "150px",
                       objectFit: "cover",
                       borderRadius: "12px",
                       cursor: "pointer",
