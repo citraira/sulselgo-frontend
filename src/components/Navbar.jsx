@@ -167,114 +167,227 @@ const Navbar = ({ scrolled, isLogin, setIsLogin }) => {
         </div>
 
         {isMenuOpen && (
-          <div style={{
-            position: 'absolute', top: '50px', right: '0',
-            backgroundColor: '#fff', borderRadius: '12px',
-            boxShadow: '0 15px 35px rgba(0,0,0,0.15)', 
-            padding: isLogin ? '10px 0' : '0',
-            zIndex: 1100, border: '1px solid rgba(0,0,0,0.05)',
-            overflow: 'hidden',
-            minWidth: '220px'
-          }}>
-
-            {isMobile && (
-              <>
-                <div
-                  style={dropdownItemStyle}
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    goProtected("/destinasi");
-                  }}
-                >
-                  Destinasi
-                </div>
-
-                <div
-                  style={dropdownItemStyle}
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    goProtected("/kategori");
-                  }}
-                >
-                  Kategori
-                </div>
-
-                <div
-                  style={dropdownItemStyle}
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    goProtected("/wilayah");
-                  }}
-                >
-                  Kota / Kabupaten
-                </div>
-
-                <div
-                  style={dropdownItemStyle}
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    navigate("/about");
-                  }}
-                >
-                  About
-                </div>
-
-                <div
-                  style={{
-                    height: "1px",
-                    backgroundColor: "#eee",
-                    margin: "8px 0",
-                  }}
-                />
-              </>
-            )}
-            
-            {!isLogin ? (
-              <div onClick={() => { setIsMenuOpen(false); navigate('/login'); }}
+          isMobile ? (
+            <div
+              style={{
+                position: "fixed",
+                inset: 0,
+                backgroundColor: "#fff",
+                zIndex: 9999,
+                padding: "24px",
+                overflowY: "auto",
+              }}
+            >
+              {/* Header */}
+              <div
                 style={{
-                  padding: '15px 25px',
-                  backgroundColor: '#fff',
-                  color: '#1a1a1a',
-                  fontWeight: '700',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  textAlign: 'center'
-                }}>
-                Masuk atau mendaftar
-              </div>
-            ) : (
-              <>
-                <div style={dropdownItemStyle} onClick={() => { setIsMenuOpen(false); navigate('/favorit'); }}>
-                  Favorit
-                </div>
-
-                <div style={dropdownItemStyle} onClick={() => { setIsMenuOpen(false); navigate('/profil'); }}>
-                  Profil
-                </div>
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "40px",
+                }}
+              >
+                <img
+                  src="https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781033400/sulselgo/logo_sulselgoo.png"
+                  alt="Logo"
+                  style={{ height: "55px" }}
+                />
 
                 <div
-                  style={dropdownItemStyle}
-
-                  onClick={() => {
-
-                    setIsMenuOpen(false);
-
-                    navigate('/panduan');
-
+                  onClick={() => setIsMenuOpen(false)}
+                  style={{
+                    fontSize: "40px",
+                    cursor: "pointer",
+                    color: "#777",
                   }}
                 >
-                  Panduan Pengguna
+                  ✕
                 </div>
+              </div>
 
-                <div style={{ height: '1px', backgroundColor: '#eee', margin: '8px 0' }}></div>
-                
-                <div style={{ ...dropdownItemStyle, color: '#d93025' }} onClick={handleLogout}>
-                  Keluar
+              <div
+                style={dropdownItemStyle}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  goProtected("/destinasi");
+                }}
+              >
+                Destinasi
+              </div>
+
+              <div
+                style={dropdownItemStyle}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  goProtected("/kategori");
+                }}
+              >
+                Kategori
+              </div>
+
+              <div
+                style={dropdownItemStyle}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  goProtected("/wilayah");
+                }}
+              >
+                Kota / Kabupaten
+              </div>
+
+              <div
+                style={dropdownItemStyle}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  navigate("/about");
+                }}
+              >
+                About
+              </div>
+
+              <div
+                style={dropdownItemStyle}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  navigate("/search");
+                }}
+              >
+                Search
+              </div>
+
+              <hr />
+
+              {isLogin ? (
+                <>
+                  <div
+                    style={dropdownItemStyle}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/favorit");
+                    }}
+                  >
+                    Favorit
+                  </div>
+
+                  <div
+                    style={dropdownItemStyle}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/profil");
+                    }}
+                  >
+                    Profil
+                  </div>
+
+                  <div
+                    style={dropdownItemStyle}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/panduan");
+                    }}
+                  >
+                    Panduan Pengguna
+                  </div>
+
+                  <div
+                    style={{
+                      ...dropdownItemStyle,
+                      color: "#d93025",
+                    }}
+                    onClick={handleLogout}
+                  >
+                    Keluar
+                  </div>
+                </>
+              ) : (
+                <div
+                  style={dropdownItemStyle}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/login");
+                  }}
+                >
+                  Masuk atau Mendaftar
                 </div>
-              </>
-            )}
-          </div>
+              )}
+            </div>
+          ) : (
+            <div
+              style={{
+                position: "absolute",
+                top: "50px",
+                right: 0,
+                backgroundColor: "#fff",
+                borderRadius: "12px",
+                boxShadow: "0 15px 35px rgba(0,0,0,0.15)",
+                padding: isLogin ? "10px 0" : "0",
+                minWidth: "220px",
+                overflow: "hidden",
+              }}
+            >
+              {!isLogin ? (
+                <div
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/login");
+                  }}
+                  style={{
+                    padding: "15px 25px",
+                    cursor: "pointer",
+                    fontWeight: "700",
+                  }}
+                >
+                  Masuk atau mendaftar
+                </div>
+              ) : (
+                <>
+                  <div
+                    style={dropdownItemStyle}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/favorit");
+                    }}
+                  >
+                    Favorit
+                  </div>
+
+                  <div
+                    style={dropdownItemStyle}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/profil");
+                    }}
+                  >
+                    Profil
+                  </div>
+
+                  <div
+                    style={dropdownItemStyle}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate("/panduan");
+                    }}
+                  >
+                    Panduan Pengguna
+                  </div>
+
+                  <hr />
+
+                  <div
+                    style={{
+                      ...dropdownItemStyle,
+                      color: "#d93025",
+                    }}
+                    onClick={handleLogout}
+                  >
+                    Keluar
+                  </div>
+                </>
+              )}
+            </div>
+          )
         )}
+        
       </div>
     </nav>
   );
