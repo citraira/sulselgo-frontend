@@ -5,6 +5,7 @@ const DetailPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "null");
+  const [isZoomed, setIsZoomed] = useState(false);
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -1286,71 +1287,85 @@ const handleSimpanEdit = async () => {
     }}
   >
     {/* Tombol Sebelumnya */}
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        prevImage();
-      }}
-      style={{
-        position: "absolute",
-        left: "20px",
-        top: "50%",
-        transform: "translateY(-50%)",
-        width: "60px",
-        height: "60px",
-        borderRadius: "50%",
-        border: "none",
-        background: "rgba(255,255,255,0.95)",
-        fontSize: "40px",
-        cursor: "pointer",
-        zIndex: 10001
-      }}
-    >
-      ‹
-    </button>
+      {!isZoomed && (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          prevImage();
+        }}
+        style={{
+          position: "absolute",
+          left: "20px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          width: window.innerWidth <= 768 ? "45px" : "60px",
+          height: window.innerWidth <= 768 ? "45px" : "60px",
+          borderRadius: "50%",
+          border: "none",
+          background:
+            window.innerWidth <= 768
+              ? "rgba(255,255,255,0.35)"
+              : "rgba(255,255,255,0.95)",
+          backdropFilter: "blur(4px)",
+          fontSize: window.innerWidth <= 768 ? "28px" : "40px",
+          color: "#333",
+          cursor: "pointer",
+          zIndex: 10001,
+        }}
+      >
+        ‹
+      </button>
+    )}
 
     {/* Tombol Berikutnya */}
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        nextImage();
-      }}
-      style={{
-        position: "absolute",
-        right: "20px",
-        top: "50%",
-        transform: "translateY(-50%)",
-        width: "60px",
-        height: "60px",
-        borderRadius: "50%",
-        border: "none",
-        background: "rgba(255,255,255,0.95)",
-        fontSize: "40px",
-        cursor: "pointer",
-        zIndex: 10001
-      }}
-    >
-      ›
-    </button>
+      {!isZoomed && (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          nextImage();
+        }}
+        style={{
+          position: "absolute",
+          right: "20px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          width: window.innerWidth <= 768 ? "45px" : "60px",
+          height: window.innerWidth <= 768 ? "45px" : "60px",
+          borderRadius: "50%",
+          border: "none",
+          background:
+            window.innerWidth <= 768
+              ? "rgba(255,255,255,0.35)"
+              : "rgba(255,255,255,0.95)",
+          backdropFilter: "blur(4px)",
+          fontSize: window.innerWidth <= 768 ? "28px" : "40px",
+          color: "#333",
+          cursor: "pointer",
+          zIndex: 10001,
+        }}
+      >
+        ›
+      </button>
+    )}
 
     {/* Gambar */}
-    <img
-      src={selectedImage}
-      alt="preview"
-      onClick={(e) => e.stopPropagation()}
-      onDoubleClick={() =>
-        setZoom(zoom === 1 ? 2 : 1)
-      }
-      style={{
-        maxWidth: "80%",
-        maxHeight: "80%",
-        objectFit: "contain",
-        borderRadius: "14px",
-        transform: `scale(${zoom})`,
-        transition: "0.3s ease",
-        zIndex: 10000
-      }}
-    />
+      <img
+        src={selectedImage}
+        alt="preview"
+        onClick={(e) => e.stopPropagation()}
+        onDoubleClick={() =>
+          setZoom(zoom === 1 ? 2 : 1)
+        }
+        style={{
+          maxWidth: "80%",
+          maxHeight: "80%",
+          objectFit: "contain",
+          borderRadius: "14px",
+          transform: `scale(${zoom})`,
+          transition: "0.3s ease",
+          zIndex: 10000
+        }}
+      />
 
     {/* Tombol Zoom */}
     <div
