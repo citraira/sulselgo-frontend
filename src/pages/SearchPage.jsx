@@ -249,7 +249,7 @@ export default function SearchPage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          paddingTop: isMobile ? "40px" : "80px"
+          paddingTop: isMobile ? "90px" : "80px",
         }}
       >
         <div
@@ -262,6 +262,7 @@ export default function SearchPage() {
             style={{
               color: "#fff",
               fontSize: isMobile ? "34px" : "60px",
+              paddingLeft: isMobile ? "30px" : "0px",
               fontWeight: "800",
               marginBottom: "20px",
               lineHeight: "1.1"
@@ -559,10 +560,11 @@ export default function SearchPage() {
                   style={{
                     background: "#fff",
                     borderRadius: "22px",
-                    padding: "16px",
+                    padding: isMobile ? "12px" : "16px",
                     display: "flex",
-                    alignItems: "center",
-                    gap: "20px",
+                    flexDirection: isMobile ? "column" : "row",
+                    alignItems: isMobile ? "flex-start" : "center",
+                    gap: isMobile ? "12px" : "20px",
                     cursor: "pointer",
                     boxShadow: "0 6px 18px rgba(0,0,0,0.08)"
                   }}
@@ -578,11 +580,17 @@ export default function SearchPage() {
                     }}
                   />
 
-                  <div>
+                  <div
+                    style={{
+                      width: "100%"
+                    }}
+                  >
                     <h3
                       style={{
                         marginBottom: "8px",
-                        fontSize: "22px"
+                        fontSize: isMobile ? "20px" : "22px",
+                        lineHeight: "1.3",
+                        wordBreak: "break-word",
                       }}
                     >
                       {item.nama}
