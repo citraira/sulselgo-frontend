@@ -115,9 +115,9 @@ const DestinasiPage = () => {
 
       {/* HERO */}
       <div style={{
-        height: isMobile ? '550px' : '380px',
+        height: isMobile ? '280px' : '380px',
         backgroundImage: `url('${gambarDefault}')`,
-        backgroundSize: 'cover', backgroundPosition: isMobile ? 'center center' : 'center',
+        backgroundSize: 'cover', backgroundPosition: isMobile ? 'center' : 'center',
         position: 'relative'
       }}>
 
