@@ -5,6 +5,16 @@ import { useNavigate } from "react-router-dom";
 const LandingPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slides, setSlides] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const navigate = useNavigate();
 
@@ -93,7 +103,7 @@ const LandingPage = () => {
       {/* HERO SECTION */}
       <div
         style={{
-          height: '85vh',
+          height: isMobile ? '60vh' : '85vh',
           width: '100%',
           margin: 0,
 
@@ -109,7 +119,7 @@ const LandingPage = () => {
           alignItems: 'flex-end',
           justifyContent: 'center',
 
-          paddingBottom: '50px',
+          paddingBottom: isMobile ? '20px' : '50px',
 
           transition: 'background-image 0.8s ease-in-out'
         }}
@@ -121,7 +131,7 @@ const LandingPage = () => {
             background: 'rgba(0,0,0,0.5)',
             color: '#fff',
 
-            padding: '12px 25px',
+            padding: isMobile ? '10px 15px' : '12px 25px',
 
             borderRadius: '35px',
 
@@ -133,8 +143,8 @@ const LandingPage = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
 
-            minWidth: '350px',
-            maxWidth: '500px',
+            minWidth: isMobile ? '90%' : '350px',
+            maxWidth: isMobile ? '90%' : '500px',
 
             boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
           }}
@@ -177,13 +187,13 @@ const LandingPage = () => {
       <div
         style={{
           textAlign: 'center',
-          padding: '100px 10%',
+          padding: isMobile ? '50px 20px' : '100px 10%',
           backgroundColor: '#fff'
         }}
       >
         <h1
           style={{
-            fontSize: '30px',
+            fontSize: isMobile ? '22px' : '30px',
             color: '#1a1a1a',
             fontWeight: '600',
             margin: 0,
@@ -247,7 +257,7 @@ const LandingPage = () => {
           
 
               style={{
-                height: '450px',
+                height: isMobile ? '320px' : '450px',
 
                 borderRadius: '25px',
 
