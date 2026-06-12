@@ -4,6 +4,7 @@ import API from "../api/axios";
 
 export default function SearchPage() {
   const navigate = useNavigate();
+  const isMobile = window.innerWidth <= 768;
 
   const [keyword, setKeyword] = useState("");
   const [results, setResults] = useState([]);
@@ -235,7 +236,7 @@ export default function SearchPage() {
       
       <div
         style={{
-          height: "420px",
+          height: isMobile ? "300px" : "420px",
           width: "100%",
           background:
             "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('/tanjung bira.jpg')",
@@ -248,7 +249,7 @@ export default function SearchPage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          paddingTop: "80px"
+          paddingTop: isMobile ? "40px" : "80px"
         }}
       >
         <div
@@ -260,7 +261,7 @@ export default function SearchPage() {
           <h1
             style={{
               color: "#fff",
-              fontSize: "60px",
+              fontSize: isMobile ? "34px" : "60px",
               fontWeight: "800",
               marginBottom: "20px",
               lineHeight: "1.1"
@@ -274,7 +275,7 @@ export default function SearchPage() {
           <p
             style={{
               color: "rgba(255,255,255,0.9)",
-              fontSize: "18px",
+              fontSize: isMobile ? "14px" : "18px",
               marginBottom: "35px",
               maxWidth: "600px",
               lineHeight: "1.8"
@@ -290,7 +291,7 @@ export default function SearchPage() {
             style={{
               background: "rgba(255,255,255,0.95)",
               borderRadius: "25px",
-              padding: "18px 24px",
+              padding: isMobile ? "14px 18px" : "18px 24px",
               display: "flex",
               alignItems: "center",
               gap: "15px",
@@ -331,7 +332,7 @@ export default function SearchPage() {
                 border: "none",
                 outline: "none",
                 width: "100%",
-                fontSize: "17px",
+                fontSize: isMobile ? "15px" : "17px",
                 background: "transparent",
                 paddingRight: "45px"
               }}
@@ -413,7 +414,9 @@ export default function SearchPage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
+              gridTemplateColumns: isMobile
+                ? "1fr"
+                : "repeat(4, 1fr)",
               gap: "18px"
             }}
           >
@@ -426,7 +429,8 @@ export default function SearchPage() {
                   borderRadius: "24px",
                   padding: "18px",
                   display: "flex",
-                  alignItems: "center",
+                  flexDirection: isMobile ? "column" : "row",
+                  alignItems: isMobile ? "flex-start" : "center",
                   gap: "18px",
                   cursor: "pointer",
                   boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
@@ -567,8 +571,8 @@ export default function SearchPage() {
                     src={item.gambar}
                     alt={item.nama}
                     style={{
-                      width: "140px",
-                      height: "100px",
+                    width: isMobile ? "100%" : "140px",
+                    height: isMobile ? "180px" : "100px",
                       objectFit: "cover",
                       borderRadius: "18px"
                     }}
@@ -673,8 +677,9 @@ export default function SearchPage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(330px, 1fr))",
+              gridTemplateColumns: isMobile
+                ? "1fr"
+                : "repeat(auto-fill, minmax(330px, 1fr))",
               gap: "30px"
             }}
           >
@@ -704,7 +709,7 @@ export default function SearchPage() {
                     alt={item.nama}
                     style={{
                       width: "100%",
-                      height: "250px",
+                      height: isMobile ? "180px" : "250px",
                       objectFit: "cover"
                     }}
                   />
@@ -734,7 +739,7 @@ export default function SearchPage() {
                   <h2
                     style={{
                       marginBottom: "12px",
-                      fontSize: "26px"
+                      fontSize: isMobile ? "20px" : "26px",
                     }}
                   >
                     {item.nama}
