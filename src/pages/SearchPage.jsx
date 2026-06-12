@@ -245,7 +245,7 @@ export default function SearchPage() {
           borderBottomLeftRadius: "40px",
           borderBottomRightRadius: "40px",
           position: "relative",
-          overflow: "hidden",
+          overflow: "visible",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -300,8 +300,8 @@ export default function SearchPage() {
               boxShadow: "0 12px 35px rgba(0,0,0,0.22)",
               backdropFilter: "blur(15px)",
               zIndex: 999,
-              marginTop: isMobile ? "24px" : "0",
-              marginBottom: isMobile ? "-35px" : "0",
+              marginTop: isMobile ? "16px" : "0",
+              marginBottom: isMobile ? "" : "0",
             }}
           >
             
@@ -388,7 +388,7 @@ export default function SearchPage() {
         <div
           style={{
             width: "88%",
-            margin: "50px auto"
+            margin: isMobile ? "80px auto 50px" : "50px auto"
           }}
         >
           <div
