@@ -5,6 +5,7 @@ const Navbar = ({ scrolled, isLogin, setIsLogin }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); 
   const menuRef = useRef(null); 
 
   const isLandingPage = location.pathname === "/";
@@ -18,6 +19,16 @@ const Navbar = ({ scrolled, isLogin, setIsLogin }) => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  window.addEventListener("resize", handleResize);
+
+  return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleLogout = () => {
@@ -86,7 +97,7 @@ const Navbar = ({ scrolled, isLogin, setIsLogin }) => {
       </Link>
 
       <ul style={{
-        display: 'flex', listStyle: 'none', gap: '15px', margin: 0, padding: 0, 
+        display: isMobile ? 'none' : 'flex', listStyle: 'none', gap: '15px', margin: 0, padding: 0, 
         alignItems: 'center', color: showWhiteNavbar ? '#1a1a1a' : '#fff', 
         fontWeight: '600', fontSize: '15px',
         textShadow: showWhiteNavbar ? 'none' : '0 1px 2px rgba(0,0,0,0.5)',
@@ -121,7 +132,7 @@ const Navbar = ({ scrolled, isLogin, setIsLogin }) => {
       <div 
         ref={menuRef} 
         style={{ 
-          display: 'flex', alignItems: 'center', gap: '25px', 
+          display: 'flex', alignItems: 'center', gap: isMobile ? '15px' : '25px', 
           color: showWhiteNavbar ? '#1a1a1a' : '#fff',
           position: 'relative' 
         }}
@@ -165,6 +176,58 @@ const Navbar = ({ scrolled, isLogin, setIsLogin }) => {
             overflow: 'hidden',
             minWidth: '220px'
           }}>
+
+            {isMobile && (
+              <>
+                <div
+                  style={dropdownItemStyle}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    goProtected("/destinasi");
+                  }}
+                >
+                  Destinasi
+                </div>
+
+                <div
+                  style={dropdownItemStyle}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    goProtected("/kategori");
+                  }}
+                >
+                  Kategori
+                </div>
+
+                <div
+                  style={dropdownItemStyle}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    goProtected("/wilayah");
+                  }}
+                >
+                  Kota / Kabupaten
+                </div>
+
+                <div
+                  style={dropdownItemStyle}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/about");
+                  }}
+                >
+                  About
+                </div>
+
+                <div
+                  style={{
+                    height: "1px",
+                    backgroundColor: "#eee",
+                    margin: "8px 0",
+                  }}
+                />
+              </>
+            )}
             
             {!isLogin ? (
               <div onClick={() => { setIsMenuOpen(false); navigate('/login'); }}

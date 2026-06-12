@@ -47,7 +47,7 @@ const LandingPage = () => {
 
     API.get("/top-destinasi")
       .then((res) => {
-
+        console.log("DATA API:", res.data);
         setSlides(res.data);
 
       })
@@ -235,7 +235,8 @@ const LandingPage = () => {
           }}
         >
 
-        {slides.slice(0, 4).map((item, i) => (
+      {Array.isArray(slides) &&
+        slides.slice(0, 4).map((item, i) => (
           <div
             key={i}
             onClick={() =>
