@@ -277,7 +277,7 @@ export default function SearchPage() {
             style={{
               color: "rgba(255,255,255,0.9)",
               fontSize: isMobile ? "14px" : "18px",
-              marginBottom: "35px",
+              marginBottom: "10px",
               maxWidth: "600px",
               lineHeight: "1.8"
             }}
