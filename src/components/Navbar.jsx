@@ -245,16 +245,6 @@ const Navbar = ({ scrolled, isLogin, setIsLogin }) => {
                 About
               </div>
 
-              <div
-                style={dropdownItemStyle}
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  navigate("/search");
-                }}
-              >
-                Search
-              </div>
-
               <hr />
 
               {isLogin ? (
@@ -335,6 +325,9 @@ const Navbar = ({ scrolled, isLogin, setIsLogin }) => {
                     padding: "15px 25px",
                     cursor: "pointer",
                     fontWeight: "700",
+                    color: "#000",          // <-- tambahkan ini
+                    backgroundColor: "#fff",
+                    textAlign: "center",
                   }}
                 >
                   Masuk atau mendaftar
@@ -387,7 +380,7 @@ const Navbar = ({ scrolled, isLogin, setIsLogin }) => {
             </div>
           )
         )}
-        
+
       </div>
     </nav>
   );
