@@ -236,7 +236,7 @@ export default function SearchPage() {
       
       <div
         style={{
-          height: isMobile ? "300px" : "420px",
+          height: isMobile ? "340px" : "420px",
           width: "100%",
           background:
             "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('/tanjung bira.jpg')",
@@ -262,7 +262,7 @@ export default function SearchPage() {
             style={{
               color: "#fff",
               fontSize: isMobile ? "34px" : "60px",
-              paddingLeft: isMobile ? "30px" : "0px",
+              paddingLeft: isMobile ? "48px" : "0px",
               fontWeight: "800",
               marginBottom: "20px",
               lineHeight: "1.1"
@@ -277,7 +277,7 @@ export default function SearchPage() {
             style={{
               color: "rgba(255,255,255,0.9)",
               fontSize: isMobile ? "14px" : "18px",
-              marginBottom: "10px",
+              marginBottom: isMobile ? "22px" : "10px",
               maxWidth: "600px",
               lineHeight: "1.8"
             }}
@@ -290,17 +290,18 @@ export default function SearchPage() {
           {/* SEARCH BOX */}
           <div
             style={{
-              background: "rgba(255,255,255,0.95)",
+              background: "rgba(255,255,255,0.98)",
               borderRadius: "25px",
               padding: isMobile ? "14px 18px" : "18px 24px",
               display: "flex",
               alignItems: "center",
               gap: "15px",
               position: "relative",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+              boxShadow: "0 12px 35px rgba(0,0,0,0.22)",
               backdropFilter: "blur(15px)",
-              zIndex: 100,
-              marginBottom: isMobile ? "-0px" : "0px",
+              zIndex: 999,
+              marginTop: isMobile ? "24px" : "0",
+              marginBottom: isMobile ? "-35px" : "0",
             }}
           >
             
