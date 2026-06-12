@@ -9,6 +9,7 @@ const DestinasiPage = () => {
 
   const gambarDefault = 'https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781027521/sulselgo/dpdmbu1yrbmiqyxmcpho.png';
   const user = JSON.parse(localStorage.getItem('user'));
+  const isMobile = window.innerWidth <= 768;
 
   // ================= FAVORIT =================
   useEffect(() => {
@@ -91,16 +92,16 @@ const DestinasiPage = () => {
 
   // ================= STYLE =================
   const baseCardStyle = {
-    aspectRatio: '1 / 1',
-    borderRadius: '15px',
-    overflow: 'hidden',
-    position: 'relative',
-    border: '3px solid #fff',
-    boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
-    flexShrink: 0,
-    cursor: 'pointer'
-  };
-
+  aspectRatio: '1 / 1',
+  borderRadius: '15px',
+  overflow: 'hidden',
+  position: 'relative',
+  border: '3px solid #fff',
+  boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+  flexShrink: 0,
+  cursor: 'pointer',
+  minHeight: isMobile ? '120px' : '170px'
+};
   const overlayStyle = {
     position: 'absolute', bottom: 0, left: 0, width: '100%',
     padding: '15px 12px',
@@ -114,9 +115,9 @@ const DestinasiPage = () => {
 
       {/* HERO */}
       <div style={{
-        height: '380px', width: '100%',
+        height: isMobile ? '550px' : '380px',
         backgroundImage: `url('${gambarDefault}')`,
-        backgroundSize: 'cover', backgroundPosition: 'center',
+        backgroundSize: 'cover', backgroundPosition: isMobile ? 'center center' : 'center',
         position: 'relative'
       }}>
 
@@ -165,11 +166,23 @@ const DestinasiPage = () => {
       </div>
 
       {/* TITLE */}
-      <div style={{ textAlign: 'center', padding: '50px 8% 40px' }}>
+      <div
+  style={{
+    textAlign: 'center',
+    padding: isMobile ? '35px 6% 30px' : '50px 8% 40px'
+  }}
+>
         <p style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '2px' }}>
           PESONA SULAWESI SELATAN
         </p>
-        <h1 style={{ fontSize: '26px', fontWeight: '700', marginTop: '10px' }}>
+        <h1
+  style={{
+    fontSize: isMobile ? '18px' : '26px',
+    fontWeight: '700',
+    marginTop: '10px',
+    lineHeight: '1.6'
+  }}
+>
           Menelusuri Jejak Budaya dan Keajaiban Alam yang Tak Terlupakan.
         </h1>
       </div>
@@ -180,11 +193,13 @@ const DestinasiPage = () => {
         margin: '0 auto',
         width: '95%',
         maxWidth: '1100px',
-        padding: '25px',
+        padding: isMobile ? '15px' : '25px',
         borderRadius: '25px',
         border: '3px solid #fff'
       }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile
+  ? 'repeat(2, 1fr)'
+  : 'repeat(3, 1fr)', gap: '20px' }}>
             {kota.map((k, idx) => (
               <div 
                 key={idx} 
@@ -202,7 +217,7 @@ const DestinasiPage = () => {
 
       {/* TOP DESTINASI */}
       <div style={{ padding: '60px 5% 100px' }}>
-        <h2 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '45px' }}>
+        <h2 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '800', marginBottom: '45px' }}>
           5 Destinasi Teratas
         </h2>
 
@@ -216,9 +231,9 @@ const DestinasiPage = () => {
                 key={idx}
                 onClick={() => handleClickDestinasi(item)}
                 style={{
-                  width: '350px',
-                  minWidth: '350px',
-                  height: '350px',
+                  width: isMobile ? '260px' : '350px',
+                  minWidth: isMobile ? '260px' : '350px',
+                  height: isMobile ? '260px' : '350px',
                   borderRadius: '25px',
                   overflow: 'hidden',
                   position: 'relative',
@@ -227,7 +242,6 @@ const DestinasiPage = () => {
                   cursor: 'pointer'
                 }}
               >
-
                 {/* LOVE */}
               <div
                 onClick={(e) => toggleFavorite(e, data)}
@@ -269,7 +283,7 @@ const DestinasiPage = () => {
                   color: '#fff',
                   padding: '20px'
                 }}>
-                  <div style={{ fontSize: '22px', fontWeight: '800' }}>
+                  <div style={{ fontSize: isMobile ? '18px' : '22px', fontWeight: '800' }}>
                     {data.nama}
                   </div>
                   <div>
