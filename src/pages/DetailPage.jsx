@@ -184,7 +184,7 @@ const zoomOut = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://localhost:5000/api/reviews", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -203,7 +203,7 @@ const zoomOut = () => {
 
       if (res.ok) {
         const updated = await fetch(
-          `http://localhost:5000/api/reviews/${state._id}`
+          `${import.meta.env.VITE_API_URL}/reviews/${state._id}`
         );
         const newData = await updated.json();
         setReviews(newData);
@@ -237,7 +237,7 @@ const zoomOut = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`
@@ -264,7 +264,7 @@ const handleLike = async (id) => {
   
   const token = localStorage.getItem("token");
   try {
-    const res = await fetch(`http://localhost:5000/api/reviews/${id}/like`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/like`, {
       method: "POST",
       headers: { 
         "Authorization": `Bearer ${token}`,
@@ -287,7 +287,7 @@ const handleDislike = async (id) => {
   if (!token) { console.log("Token tidak ditemukan!"); return; }
 
   try {
-    const res = await fetch(`http://localhost:5000/api/reviews/${id}/dislike`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/dislike`, {
       method: "POST",
       headers: { 
         "Authorization": `Bearer ${token}`,
@@ -323,7 +323,7 @@ const handleSimpanEdit = async () => {
     const token = localStorage.getItem("token");
 
     const res = await fetch(
-      `http://localhost:5000/api/reviews/${editReviewId}`,
+      `${import.meta.env.VITE_API_URL}/reviews/${editReviewId}`,
       {
         method: "PUT",
         headers: {
@@ -371,7 +371,7 @@ const handleSimpanEdit = async () => {
         const token = localStorage.getItem("token");
 
         const response = await fetch(
-          `http://localhost:5000/api/favorit/${user.id}`,
+          `${import.meta.env.VITE_API_URL}/favorit/${user.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -408,7 +408,7 @@ const handleSimpanEdit = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:5000/api/favorit", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/favorit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -440,7 +440,7 @@ const handleSimpanEdit = async () => {
 
       try {
         const res = await fetch(
-          `http://localhost:5000/api/reviews/${state._id}`
+          `${import.meta.env.VITE_API_URL}/reviews/${state._id}`
         );
         const data = await res.json();
         setReviews(data);
