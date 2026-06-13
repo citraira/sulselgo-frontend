@@ -1,6 +1,16 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const PanduanPage = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const panduanList = [
 
@@ -57,7 +67,7 @@ const PanduanPage = () => {
       <div
         style={{
           position: "relative",
-          height: "270px",
+          height: isMobile ? "220px" : "270px",
           backgroundImage:
             "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55)), url('/tanjung bira.jpg')",
           backgroundSize: "cover",
@@ -66,7 +76,7 @@ const PanduanPage = () => {
           alignItems: "center",
           justifyContent: "center",
           textAlign: "center",
-          padding: "0 20px"
+          padding: isMobile ? "0 15px" : "0 20px"
         }}
       >
 
@@ -74,10 +84,10 @@ const PanduanPage = () => {
           onClick={() => window.history.back()}
           style={{
             position: "absolute",
-            top: "20px",
-            left: "20px",
-            width: "42px",
-            height: "42px",
+            top: isMobile ? "15px" : "20px",
+            left: isMobile ? "15px" : "20px",
+            width: isMobile ? "38px" : "42px",
+            height: isMobile ? "38px" : "42px",
             borderRadius: "50%",
             border: "none",
             background: "rgba(255,255,255,0.95)",
@@ -116,12 +126,12 @@ const PanduanPage = () => {
           <div
             style={{
               display: "inline-block",
-              padding: "8px 18px",
+              padding: isMobile ? "6px 14px" : "8px 18px",
               borderRadius: "999px",
               background: "rgba(255,255,255,0.15)",
               backdropFilter: "blur(10px)",
               color: "#fff",
-              fontSize: "13px",
+              fontSize: isMobile ? "11px" : "13px",
               fontWeight: "600",
               marginBottom: "20px",
               border: "1px solid rgba(255,255,255,0.2)"
@@ -133,7 +143,7 @@ const PanduanPage = () => {
           <h1
             style={{
               color: "#fff",
-              fontSize: "48px",
+              fontSize: isMobile ? "30px" : "48px",
               fontWeight: "700",
               margin: 0,
               lineHeight: 1.2
@@ -145,10 +155,10 @@ const PanduanPage = () => {
           <p
             style={{
               color: "rgba(255,255,255,0.9)",
-              marginTop: "18px",
-              fontSize: "17px",
+              fontSize: isMobile ? "14px" : "17px",
+              marginTop: isMobile ? "12px" : "18px",
+              lineHeight: 1.6,
               maxWidth: "700px",
-              lineHeight: 1.7
             }}
           >
             Pelajari cara menggunakan fitur-fitur website
@@ -161,20 +171,28 @@ const PanduanPage = () => {
       {/* CONTENT */}
       <div
         style={{
-          width: "min(1200px, calc(100% - 40px))",
-          margin: "-70px auto 0 auto",
+          width: isMobile
+            ? "calc(100% - 20px)"
+            : "min(1200px, calc(100% - 40px))",
+
+          margin: isMobile
+            ? "-35px auto 0 auto"
+            : "-70px auto 0 auto",
+
+          paddingBottom: isMobile ? "40px" : "70px",
           position: "relative",
           zIndex: 2,
-          paddingBottom: "70px"
         }}
       >
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "28px"
+            gridTemplateColumns: isMobile
+              ? "1fr"
+              : "repeat(auto-fit, minmax(280px, 1fr))",
+
+            gap: isMobile ? "18px" : "28px",
           }}
         >
 
@@ -187,9 +205,8 @@ const PanduanPage = () => {
                 background: "rgba(255,255,255,0.85)",
                 backdropFilter: "blur(14px)",
 
-                borderRadius: "28px",
-
-                padding: "34px 28px",
+                borderRadius: isMobile ? "20px" : "28px",
+                padding: isMobile ? "22px 18px" : "34px 28px",
 
                 boxShadow:
                   "0 15px 35px rgba(0,0,0,0.08)",
@@ -215,10 +232,11 @@ const PanduanPage = () => {
 
               <div
                 style={{
-                  width: "75px",
-                  height: "75px",
-
-                  borderRadius: "24px",
+                  width: isMobile ? "60px" : "75px",
+                  height: isMobile ? "60px" : "75px",
+                  fontSize: isMobile ? "28px" : "36px",
+                  borderRadius: isMobile ? "18px" : "24px",
+                  marginBottom: isMobile ? "18px" : "24px",
 
                   background:
                     "linear-gradient(135deg, #8b0000, #b11212)",
@@ -226,11 +244,6 @@ const PanduanPage = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-
-                  fontSize: "36px",
-
-                  marginBottom: "24px",
-
                   boxShadow:
                     "0 10px 25px rgba(139,0,0,0.25)"
                 }}
@@ -240,9 +253,9 @@ const PanduanPage = () => {
 
               <h2
                 style={{
-                  fontSize: "24px",
+                  fontSize: isMobile ? "20px" : "24px",
                   color: "#181818",
-                  marginBottom: "14px",
+                  marginBottom: isMobile ? "10px" : "14px",
                   fontWeight: "700"
                 }}
               >
@@ -252,8 +265,8 @@ const PanduanPage = () => {
               <p
                 style={{
                   color: "#666",
-                  lineHeight: "1.9",
-                  fontSize: "15px",
+                  fontSize: isMobile ? "14px" : "15px",
+                  lineHeight: isMobile ? "1.7" : "1.9",
                   margin: 0
                 }}
               >
