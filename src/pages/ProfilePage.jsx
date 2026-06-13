@@ -152,7 +152,7 @@ useEffect(() => {
       <div
         style={{
           width: "100%",
-          height: isMobile ? "220px" : "320px",
+          height: isMobile ? "190px" : "320px",
           position: "relative",
           overflow: "hidden"
         }}
@@ -180,10 +180,10 @@ useEffect(() => {
           onClick={() => navigate(-1)}
           style={{
             position: "absolute",
-            top: "20px",
-            left: "20px",
-            width: "44px",
-            height: "44px",
+            top: isMobile ? "16px" : "20px",
+            left: isMobile ? "16px" : "20px",
+            width: isMobile ? "40px" : "44px",
+            height: isMobile ? "40px" : "44px",
             borderRadius: "50%",
             border: "none",
             background: "rgba(255,255,255,0.92)",
@@ -251,7 +251,7 @@ useEffect(() => {
         style={{
           width: isMobile ? "calc(100% - 24px)" : "min(1100px, calc(100% - 40px))",
           margin: "0 auto",
-          marginTop: isMobile ? "14px" : "-20px",
+          marginTop: isMobile ? "20px" : "-20px",
           position: "relative",
           zIndex: 2,
           paddingBottom: "50px"
@@ -261,7 +261,7 @@ useEffect(() => {
           style={{
             display: "grid",
             gridTemplateColumns: isMobile ? "1fr" : "320px 1fr",
-            gap: "24px",
+            gap: isMobile ? "18px" : "24px",
             alignItems: "start"
           }}
         >
@@ -277,7 +277,7 @@ useEffect(() => {
           >
             <div
               style={{
-                padding: isMobile ? "24px 20px" : "30px 28px",
+                padding: isMobile ? "20px 16px" : "30px 28px",
                 background: "linear-gradient(135deg, #8b0000, #b11212)",
                 color: "#fff",
                 textAlign: "center",
@@ -286,8 +286,9 @@ useEffect(() => {
             >
               <div
                 style={{
-                  width: isMobile ? "110px" : "126px",
-                  height: isMobile ? "110px" : "126px",
+                  width: isMobile ? "90px" : "126px",
+                  height: isMobile ? "90px" : "126px",
+                  fontSize: isMobile ? "38px" : "54px",
                   borderRadius: "50%",
                   margin: "0 auto 18px auto",
                   background: "rgba(255,255,255,0.15)",
@@ -295,7 +296,6 @@ useEffect(() => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: isMobile ? "46px" : "54px",
                   boxShadow: "0 10px 25px rgba(0,0,0,0.18)"
                 }}
               >
@@ -335,7 +335,7 @@ useEffect(() => {
                     borderRadius: "14px",
                     border: "1px solid rgba(255,255,255,0.4)",
                     outline: "none",
-                    fontSize: isMobile ? "24px" : "28px",
+                    fontSize: isMobile ? "20px" : "28px",
                     fontWeight: "700",
                     color: "#fff",
                     background: "rgba(255,255,255,0.12)",
@@ -452,7 +452,7 @@ useEffect(() => {
           >
             <div
               style={{
-                padding: isMobile ? "22px 20px 18px 20px" : "28px 30px 18px 30px",
+                padding: isMobile ? "18px 16px" : "28px 30px 18px 30px",
                 borderBottom: "1px solid #efefef",
                 display: "flex",
                 justifyContent: "space-between",
@@ -515,7 +515,7 @@ useEffect(() => {
                       backgroundColor: "#fbfbfb",
                       border: "1px solid #ededed",
                       borderRadius: "20px",
-                      padding: isMobile ? "16px" : "18px 20px",
+                      padding: isMobile ? "14px" : "18px 20px",
                       display: "grid",
                       gridTemplateColumns: isMobile ? "1fr" : "220px 1fr",
                       gap: "18px",
@@ -531,15 +531,15 @@ useEffect(() => {
                     >
                       <div
                         style={{
-                          width: "42px",
-                          height: "42px",
+                          width: isMobile ? "36px" : "42px",
+                          height: isMobile ? "36px" : "42px",
+                          fontSize: isMobile ? "16px" : "18px",
                           borderRadius: "14px",
                           backgroundColor: "#f3e6e6",
                           color: "#8b0000",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: "18px",
                           flexShrink: 0
                         }}
                       >
@@ -636,7 +636,7 @@ useEffect(() => {
                       style={{
                         flex: 1,
                         minWidth: isMobile ? "100%" : "180px",
-                        padding: "15px 18px",
+                        padding: isMobile ? "13px 16px" : "15px 18px",
                         borderRadius: "16px",
                         border: "1px solid #d9d9d9",
                         backgroundColor: "#fff",
