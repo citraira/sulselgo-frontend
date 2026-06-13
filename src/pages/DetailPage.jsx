@@ -28,6 +28,7 @@ const DetailPage = () => {
   const [editRatingInput, setEditRatingInput] = useState(0);
   const [editIsiUlasan, setEditIsiUlasan] = useState("");
   const [dislikeCounts, setDislikeCounts] = useState({}); 
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   const nextImage = () => {
   const next =
@@ -1054,8 +1055,11 @@ const handleSimpanEdit = async () => {
             </div>
           ) : (
             <div style={{ marginBottom: "10px" }}>
-              {filteredReviews.length > 0 ? (
-                filteredReviews.map((item, index) => {
+                  {filteredReviews.length > 0 ? (
+                    (showAllReviews
+                      ? filteredReviews
+                      : filteredReviews.slice(0, 5)
+                    ).map((item, index) => {
                     const ownerId = item.userId?._id || item.userId;
                     const isOwner = user?.id === ownerId;
                     const username = item.userId?.username || item.nama || "user";
@@ -1264,6 +1268,33 @@ const handleSimpanEdit = async () => {
                   }}
                 >
                   Belum ada ulasan untuk filter bintang ini.
+                </div>
+              )}
+
+              {filteredReviews.length > 5 && (
+                <div
+                  style={{
+                    textAlign: "center",
+                    marginTop: "20px"
+                  }}
+                >
+                  <button
+                    onClick={() =>
+                      setShowAllReviews(!showAllReviews)
+                    }
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "10px",
+                      border: "1px solid #ccc",
+                      backgroundColor: "#fff",
+                      cursor: "pointer",
+                      fontWeight: "600"
+                    }}
+                  >
+                    {showAllReviews
+                      ? "Tampilkan Lebih Sedikit"
+                      : `Lihat ${filteredReviews.length - 5} Ulasan Lainnya`}
+                  </button>
                 </div>
               )}
             </div>
