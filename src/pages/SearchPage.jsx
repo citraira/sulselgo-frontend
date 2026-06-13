@@ -260,17 +260,17 @@ export default function SearchPage() {
         >
         <h1
           style={{
-            fontSize: isMobile ? "30px" : "72px",
+            fontSize: isMobile ? "24px" : "72px",
             fontWeight: "700",
-            lineHeight: "1.1",
-            marginBottom: "12px",
+            lineHeight: "1.15",
+            marginBottom: "16px",
             color: "#fff",
-            maxWidth: isMobile ? "280px" : "700px",
+            marginLeft: isMobile ? "55px" : "0",
+            maxWidth: isMobile ? "220px" : "700px",
           }}
         >
           Jelajahi Sulawesi Selatan
         </h1>
-
           <p
             style={{
               color: "rgba(255,255,255,0.9)",
@@ -400,14 +400,22 @@ export default function SearchPage() {
             <div>
               <h2
                 style={{
-                  fontSize: "34px",
+                  fontSize: isMobile ? "24px" : "34px",
                   fontWeight: "800",
-                  marginBottom: "8px"
+                  marginBottom: "8px",
+                  lineHeight: "1.2",
                 }}
               >
                 Riwayat Pencarian
               </h2>
-              <p style={{ color: "#666", fontSize: "15px" }}>
+
+              <p
+                style={{
+                  color: "#666",
+                  fontSize: isMobile ? "14px" : "15px",
+                  lineHeight: "1.6",
+                }}
+              >
                 Temukan kembali destinasi yang pernah Anda cari.
               </p>
             </div>
