@@ -261,7 +261,7 @@ export default function SearchPage() {
         <h1
           style={{
             fontSize: isMobile ? "26px" : "72px",
-            fontWeight: "800",
+            fontWeight: "700",
             lineHeight: "1.15",
             marginBottom: "16px",
             color: "#fff",
