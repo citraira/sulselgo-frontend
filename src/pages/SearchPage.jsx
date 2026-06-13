@@ -260,11 +260,12 @@ export default function SearchPage() {
         >
         <h1
           style={{
-            fontSize: window.innerWidth <= 768 ? "36px" : "72px",
+            fontSize: isMobile ? "30px" : "72px",
             fontWeight: "700",
-            lineHeight: window.innerWidth <= 768 ? "1.1" : "1.2",
-            marginBottom: "16px",
+            lineHeight: "1.1",
+            marginBottom: "12px",
             color: "#fff",
+            maxWidth: isMobile ? "280px" : "700px",
           }}
         >
           Jelajahi Sulawesi Selatan
