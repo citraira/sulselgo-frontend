@@ -236,7 +236,7 @@ export default function SearchPage() {
       
       <div
         style={{
-          height: isMobile ? "340px" : "420px",
+          height: isMobile ? "280px" : "420px",
           width: "100%",
           background:
             "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781029397/sulselgo/k5ptrmeg8u3mzniztyws.png')",
@@ -260,7 +260,7 @@ export default function SearchPage() {
         >
         <h1
           style={{
-            fontSize: isMobile ? "26px" : "72px",
+            fontSize: isMobile ? "2px" : "72px",
             fontWeight: "700",
             lineHeight: "1.15",
             marginBottom: "16px",
