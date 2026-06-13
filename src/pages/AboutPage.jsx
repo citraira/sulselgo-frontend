@@ -1,17 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AboutPage = () => {
   const navigate = useNavigate();
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div style={{ 
       backgroundColor: '#fff', 
       minHeight: '100vh', 
-      paddingTop: '100px', // Agar tidak tertutup Navbar
-      paddingBottom: '60px',
-      paddingLeft: '8%', 
-      paddingRight: '8%',
+      paddingTop: isMobile ? '80px' : '100px',
+      paddingBottom: isMobile ? '40px' : '60px',
+      paddingLeft: isMobile ? '20px' : '8%',
+      paddingRight: isMobile ? '20px' : '8%',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center'
@@ -22,10 +33,10 @@ const AboutPage = () => {
         onClick={() => navigate(-1)}
         style={{
           position: 'absolute',
-          top: '100px',
-          left: '8%',
-          width: '42px',
-          height: '42px',
+          top: isMobile ? '85px' : '100px',
+          left: isMobile ? '20px' : '8%',
+          width: isMobile ? '38px' : '42px',
+          height: isMobile ? '38px' : '42px',
           borderRadius: '50%',
           border: 'none',
           background: 'rgba(255,255,255,0.95)',
@@ -60,19 +71,19 @@ const AboutPage = () => {
       </button>
 
       {/* LOGO UTAMA DI TENGAH */}
-      <div style={{ marginBottom: '50px', textAlign: 'center' }}> 
+      <div style={{ marginBottom: isMobile ? '30px' : '50px', textAlign: 'center' }}> 
         <img 
           src="https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781033400/sulselgo/logo_sulselgoo.png" 
           alt="Sulsel Go Logo" 
-          style={{ width: '320px', height: 'auto', display: 'block' }} 
+          style={{ width: isMobile ? '240px' : '320px', height: 'auto', display: 'block' }} 
         />
       </div>
 
       {/* KOTAK DESKRIPSI (ABOUT CONTENT) */}
       <div style={{
         backgroundColor: '#fbfbfb', // Abu-abu sangat tipis sesuai gambar
-        padding: '45px 40px',
-        borderRadius: '15px',
+        padding: isMobile ? '30px 20px' : '45px 40px',
+        borderRadius: isMobile ? '10px' : '15px',
         maxWidth: '900px',
         width: '100%',
         border: '1px solid #eeeeee',
@@ -80,11 +91,11 @@ const AboutPage = () => {
         boxSizing: 'border-box'
       }}>
         <p style={{ 
-          fontSize: '16px',
-          lineHeight: '2',
+          fontSize: isMobile ? '14px' : '16px',
+          lineHeight: isMobile ? '1.8' : '2',
+          textIndent: isMobile ? '20px' : '30px',
           color: '#4a4a4a',
           textAlign: 'justify',
-          textIndent: '30px',
           margin: 0,
           fontWeight: '500'
         }}>
