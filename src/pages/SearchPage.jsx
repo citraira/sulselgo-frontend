@@ -258,20 +258,17 @@ export default function SearchPage() {
             maxWidth: "1200px"
           }}
         >
-          <h1
-            style={{
-              color: "#fff",
-              fontSize: isMobile ? "34px" : "60px",
-              paddingLeft: isMobile ? "48px" : "0px",
-              fontWeight: "800",
-              marginBottom: "20px",
-              lineHeight: "1.1"
-            }}
-          >
-            Jelajahi
-            <br />
-            Sulawesi Selatan
-          </h1>
+        <h1
+          style={{
+            fontSize: window.innerWidth <= 768 ? "36px" : "72px",
+            fontWeight: "700",
+            lineHeight: window.innerWidth <= 768 ? "1.1" : "1.2",
+            marginBottom: "16px",
+            color: "#fff",
+          }}
+        >
+          Jelajahi Sulawesi Selatan
+        </h1>
 
           <p
             style={{
