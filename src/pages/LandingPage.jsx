@@ -53,18 +53,22 @@ const LandingPage = () => {
 
   }, [changeSlider, slides.length]);
 
-  // AMBIL TOP DESTINASI + PEMULIHAN SCROLL TANPA TRANSISI SAMA SEKALI
+  // AMBIL TOP DESTINASI + MATIKAN SCROLL RESTORATION BAWAAN BROWSER
   useEffect(() => {
+    // MEMAKSA BROWSER UNTUK TIDAK MELAKUKAN SCROLL OTOMATIS BAWAAN (MATI TOTAL)
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
 
     API.get("/top-destinasi")
       .then((res) => {
         console.log("DATA API:", res.data);
         setSlides(res.data);
 
-        // Eksekusi pemulihan koordinat secara langsung tanpa objek behavior
+        // Ambil posisi terakhir dan tempatkan seketika tanpa perantara animasi browser
         const savedScrollY = sessionStorage.getItem("landing_scroll_pos");
         if (savedScrollY) {
-          window.scrollTo(0, parseInt(savedScrollY, 10)); // Langsung lompat ke koordinat y seketika
+          window.scrollTo(0, parseInt(savedScrollY, 10));
           sessionStorage.removeItem("landing_scroll_pos");
         }
       })
