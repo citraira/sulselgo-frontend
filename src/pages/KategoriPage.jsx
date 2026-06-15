@@ -34,7 +34,7 @@ const KategoriPage = () => {
   const kategoriData = [ 
     { n: 'Wisata Alam Darat', i: 'https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781029572/sulselgo/gnskugjrlyhtsy9mmkzc.png' }, 
     { n: 'Wisata Budaya & Sejarah', i: 'https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781029587/sulselgo/ehbl3jym81bijz3rtz8n.png' },
-    { n: 'Wisata Hiburan', i: 'https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781029599/sulselgo/s0v74ux2ai25vjazckqr.png' }, 
+    { n: 'Wisata Hiburan', i: 'https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781029599/sulselgo/s0v74ux2ai25vjazckqr.png' }, 
     { n: 'Wisata Laut & Pesisir', i: 'https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781029611/sulselgo/a6vmem84ipn5di7g4znf.png' }
   ];
 
@@ -152,7 +152,7 @@ return (
     <div style={{
       height: '350px',
       width: '100%',
-      backgroundImage: "url('https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781027521/sulselgo/dpdmbu1yrbmiqyxmcpho.png')",
+      backgroundImage: "url('https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781027521/sulselgo/dpdmbu1yrbmiqyxmcpho.png')",
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       position: 'relative'

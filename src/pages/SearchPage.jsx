@@ -199,7 +199,7 @@ export default function SearchPage() {
           height: isMobile ? "340px" : "420px",
           width: "100%",
           background:
-            "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781029397/sulselgo/k5ptrmeg8u3mzniztyws.png')",
+            "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781029397/sulselgo/k5ptrmeg8u3mzniztyws.png')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           borderBottomLeftRadius: "40px",

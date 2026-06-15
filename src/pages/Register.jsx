@@ -231,7 +231,7 @@ export default function Register() {
         <div className="close" onClick={() => navigate("/")}>×</div>
 
         <div className="logo">
-          <img src="https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781033400/sulselgo/logo_sulselgoo.png" alt="logo" />
+          <img src="https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781033400/sulselgo/logo_sulselgoo.png" alt="logo" />
         </div>
 
         {/* Form dihubungkan ke handleRegister */}

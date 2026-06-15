@@ -12,7 +12,7 @@ const DestinasiPage = () => {
     return savedTop ? JSON.parse(savedTop) : [];
   });
 
-  const gambarDefault = 'https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781027521/sulselgo/dpdmbu1yrbmiqyxmcpho.png';
+  const gambarDefault = 'https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781027521/sulselgo/dpdmbu1yrbmiqyxmcpho.png';
   const user = JSON.parse(localStorage.getItem('user'));
   const isMobile = window.innerWidth <= 768;
 
