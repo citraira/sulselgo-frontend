@@ -30,6 +30,12 @@ const DetailPage = () => {
   const [dislikeCounts, setDislikeCounts] = useState({}); 
   const [showAllReviews, setShowAllReviews] = useState(false);
 
+  // ================= PERBAIKAN SCROLL TO TOP =================
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [state]);
+  // ===========================================================
+
   const nextImage = () => {
   const next =
     (currentImageIndex + 1) % galeri.length;
@@ -261,7 +267,7 @@ const zoomOut = () => {
   };
 
 const handleLike = async (id) => {
-  if (!user) { navigate("/login"); return; } // Pastikan user login
+  if (!user) { navigate("/login"); return; }
   
   const token = localStorage.getItem("token");
   try {
@@ -283,7 +289,7 @@ const handleLike = async (id) => {
 };
 
 const handleDislike = async (id) => {
-  console.log("Tombol diklik untuk review ID:", id); // Tambahkan ini
+  console.log("Tombol diklik untuk review ID:", id);
   const token = localStorage.getItem("token");
   if (!token) { console.log("Token tidak ditemukan!"); return; }
 
@@ -296,7 +302,7 @@ const handleDislike = async (id) => {
       }
     });
 
-    console.log("Status response:", res.status); // Cek apakah 200, 404, atau 500
+    console.log("Status response:", res.status);
     
     if (res.ok) {
       const updatedReview = await res.json();
