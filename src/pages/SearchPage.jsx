@@ -265,8 +265,8 @@ export default function SearchPage() {
             lineHeight: "1.15",
             marginBottom: "16px",
             color: "#fff",
-            marginLeft: isMobile ? "55px" : "0",
-            maxWidth: isMobile ? "220px" : "700px",
+            marginLeft: "0",
+            maxWidth: "100%",
           }}
         >
           Jelajahi Sulawesi Selatan
