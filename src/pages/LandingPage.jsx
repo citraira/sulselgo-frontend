@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const LandingPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  // 1. Inisialisasi slides langsung dari sessionStorage jika ada, agar halaman tidak kosong saat tombol back ditekan
+  // Inisialisasi slides langsung dari sessionStorage jika ada
   const [slides, setSlides] = useState(() => {
     const savedSlides = sessionStorage.getItem("landing_preserved_slides");
     return savedSlides ? JSON.parse(savedSlides) : [];
@@ -59,18 +59,25 @@ const LandingPage = () => {
 
   }, [changeSlider, slides.length]);
 
-  // AMBIL DATA API + KONTROL SCROLL MANUAL
+  // AMBIL DATA API + KONTROL SCROLL MANUAL TANPA ANIMASI GLOBAL CSS
   useEffect(() => {
-    // Matikan pemulihan scroll otomatis bawaan browser agar tidak merusak koordinat murni kita
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
 
-    // Jika slides sudah ada di cache lokal (dari tombol back), langsung pulihkan posisi scroll secara instan tanpa menunggu API
     const savedScrollY = sessionStorage.getItem("landing_scroll_pos");
+    
     if (slides.length > 0 && savedScrollY) {
+      // PERBAIKAN UTAMA: Paksa matikan animasi smooth global CSS browser sebelum scroll melompat
+      document.documentElement.style.scrollBehavior = "auto";
+      
       window.scrollTo(0, parseInt(savedScrollY, 10));
       sessionStorage.removeItem("landing_scroll_pos");
+      
+      // Kembalikan ke setelan semula setelah melompat agar halaman lain tidak terganggu
+      setTimeout(() => {
+        document.documentElement.style.scrollBehavior = "";
+      }, 50);
     }
 
     API.get("/top-destinasi")
@@ -78,13 +85,18 @@ const LandingPage = () => {
         console.log("DATA API:", res.data);
         setSlides(res.data);
         
-        // Simpan data terbaru ke cache session untuk keperluan tombol back berikutnya
         sessionStorage.setItem("landing_preserved_slides", JSON.stringify(res.data));
 
-        // Jika baru dimuat atau cache slides diperbarui, pastikan scroll tetap di posisi yang benar
         if (savedScrollY) {
+          // Paksa matikan animasi smooth global CSS lagi di sini untuk memastikan keamanan
+          document.documentElement.style.scrollBehavior = "auto";
+          
           window.scrollTo(0, parseInt(savedScrollY, 10));
           sessionStorage.removeItem("landing_scroll_pos");
+          
+          setTimeout(() => {
+            document.documentElement.style.scrollBehavior = "";
+          }, 50);
         }
       })
       .catch((err) => {
