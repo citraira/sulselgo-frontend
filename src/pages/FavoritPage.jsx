@@ -5,33 +5,62 @@ import API from '../api/axios';
 const FavoritPage = () => {
   const navigate = useNavigate();
   
-  // State untuk menyimpan data dari database
-  const [favoritDestinasi, setFavoritDestinasi] = useState([]);
+  // 1. Inisialisasi langsung dari sessionStorage agar element tidak kosong saat tombol back ditekan
+  const [favoritDestinasi, setFavoritDestinasi] = useState(() => {
+    const savedFavorites = sessionStorage.getItem("favorit_preserved_list");
+    return savedFavorites ? JSON.parse(savedFavorites) : [];
+  });
   
-  // Mengambil data user yang sedang login dari localStorage
   const user = JSON.parse(localStorage.getItem('user'));
 
+  // ================= KONTROL SCROLL INSTAN =================
   useEffect(() => {
-    // Proteksi: Jika user belum login, arahkan ke halaman login
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
+    const savedScrollY = sessionStorage.getItem("favorit_scroll_pos");
+    if (favoritDestinasi.length > 0 && savedScrollY) {
+      // Paksa matikan animasi smooth global CSS browser sebelum scroll melompat
+      document.documentElement.style.scrollBehavior = "auto";
+      
+      window.scrollTo(0, parseInt(savedScrollY, 10));
+      sessionStorage.removeItem("favorit_scroll_pos");
+      
+      setTimeout(() => {
+        document.documentElement.style.scrollBehavior = "";
+      }, 50);
+    }
+  }, [favoritDestinasi]);
+
+  // ================= DATA FAVORIT API =================
+  useEffect(() => {
     if (!user) {
       navigate('/login');
       return;
     }
 
-    // Mengambil data favorit dari API backend
     API.get(`/favorit/${user.id}`)
       .then((res) => {
         const data = res.data;
 
-        // 🛠️ PERBAIKAN 1: Filter data untuk membuang item destinasi yang bernilai null atau undefined
         const listData = data
           .map((fav) => fav.destinasiId)
           .filter((item) => item !== null && item !== undefined);
 
         setFavoritDestinasi(listData);
+        
+        // Simpan data terbaru ke cache session untuk keperluan tombol back berikutnya
+        sessionStorage.setItem("favorit_preserved_list", JSON.stringify(listData));
       })
       .catch((err) => console.error("Gagal memuat data favorit:", err));
   }, [navigate, user?.id]);
+
+  // ================= NAVIGASI DENGAN REKAM SCROLL =================
+  const handleCardClick = (item) => {
+    sessionStorage.setItem("favorit_scroll_pos", window.scrollY);
+    navigate('/detail', { state: item });
+  };
 
   const cardStyle = {
     width: '300px',
@@ -124,9 +153,9 @@ const FavoritPage = () => {
         {favoritDestinasi.length > 0 ? (
           favoritDestinasi.map((item) => (
             <div 
-              key={item?._id} // 🛠️ PERBAIKAN 2: Optional chaining untuk mencegah pembacaan properti dari data null
+              key={item?._id}
               style={cardStyle}
-              onClick={() => navigate('/detail', { state: item })} // Navigasi ke detail wisata
+              onClick={() => handleCardClick(item)} // Menggunakan fungsi rekam scroll
             >
               {/* GAMBAR */}
               <img src={item?.gambar} alt={item?.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
