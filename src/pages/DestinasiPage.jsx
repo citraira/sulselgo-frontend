@@ -5,26 +5,45 @@ import API from "../api/axios";
 const DestinasiPage = () => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
-  const [topDestinasi, setTopDestinasi] = useState([]);
+  
+  // 1. Inisialisasi langsung dari sessionStorage agar elemen kartu langsung eksis tanpa kedipan loading saat ditekan back
+  const [topDestinasi, setTopDestinasi] = useState(() => {
+    const savedTop = sessionStorage.getItem("destinasi_preserved_top");
+    return savedTop ? JSON.parse(savedTop) : [];
+  });
 
   const gambarDefault = 'https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781027521/sulselgo/dpdmbu1yrbmiqyxmcpho.png';
   const user = JSON.parse(localStorage.getItem('user'));
   const isMobile = window.innerWidth <= 768;
+
+  // ================= KONTROL SCROLL INSTAN =================
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
+    const savedScrollY = sessionStorage.getItem("destinasi_scroll_pos");
+    if (topDestinasi.length > 0 && savedScrollY) {
+      // Paksa matikan animasi smooth global CSS browser sebelum scroll melompat
+      document.documentElement.style.scrollBehavior = "auto";
+      
+      window.scrollTo(0, parseInt(savedScrollY, 10));
+      sessionStorage.removeItem("destinasi_scroll_pos");
+      
+      setTimeout(() => {
+        document.documentElement.style.scrollBehavior = "";
+      }, 50);
+    }
+  }, [topDestinasi]);
 
   // ================= FAVORIT =================
   useEffect(() => {
     if (user) {
       API.get(`/favorit/${user.id}`)
         .then((res) => {
-
           const data = res.data;
-
-          const listId = data.map(
-            (fav) => fav.destinasiId?._id
-          );
-
+          const listId = data.map((fav) => fav.destinasiId?._id);
           setFavorites(listId);
-
         })
         .catch(err => console.error("Gagal sinkron favorit", err));
     }
@@ -39,12 +58,12 @@ const DestinasiPage = () => {
     }
 
     try {
-    const response = await API.post('/favorit', {
-      userId: user.id,
-      destinasiId: destinasi._id
-    });
+      const response = await API.post('/favorit', {
+        userId: user.id,
+        destinasiId: destinasi._id
+      });
 
-    const data = response.data;
+      const data = response.data;
 
       if (favorites.includes(destinasi._id)) {
         setFavorites(favorites.filter(id => id !== destinasi._id));
@@ -58,16 +77,15 @@ const DestinasiPage = () => {
     }
   };
 
-  // ================= NAVIGASI DESTINASI =================
+  // ================= NAVIGASI DESTINASI DENGAN REKAM SCROLL =================
   const handleClickDestinasi = (item) => {
-
+    sessionStorage.setItem("destinasi_scroll_pos", window.scrollY);
     navigate("/detail", {
       state: item
     });
-
   };
 
-  // ================= DATA KOTA =================
+  // ================= DATA KOTA DENGAN REKAM SCROLL =================
   const kota = [
     { n: 'Makassar', i: 'https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781028133/sulselgo/llxm4hcxql4rqa5rsw2k.png'},
     { n: 'Bulukumba', i: 'https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781028111/sulselgo/qnvgsseqwavko6aqyt95.png'},
@@ -77,31 +95,34 @@ const DestinasiPage = () => {
     { n: 'Barru', i: 'https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781028795/sulselgo/ls0cbxja8vo1b9clvbg2.png' }
   ];
 
+  const handleKotaClick = (cityName) => {
+    sessionStorage.setItem("destinasi_scroll_pos", window.scrollY);
+    navigate(`/kabpage/${cityName}`);
+  };
+
   // ================= TOP DESTINASI =================
   useEffect(() => {
     API.get("/top-destinasi")
       .then((res) => {
-
         const data = res.data;
-
         setTopDestinasi(data);
-
+        sessionStorage.setItem("destinasi_preserved_top", JSON.stringify(data));
       })
       .catch(err => console.error("Gagal ambil top destinasi", err));
   }, []);
 
   // ================= STYLE =================
   const baseCardStyle = {
-  aspectRatio: '1 / 1',
-  borderRadius: '15px',
-  overflow: 'hidden',
-  position: 'relative',
-  border: '3px solid #fff',
-  boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
-  flexShrink: 0,
-  cursor: 'pointer',
-  minHeight: isMobile ? '120px' : '170px'
-};
+    aspectRatio: '1 / 1',
+    borderRadius: '15px',
+    overflow: 'hidden',
+    position: 'relative',
+    border: '3px solid #fff',
+    boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+    flexShrink: 0,
+    cursor: 'pointer',
+    minHeight: isMobile ? '120px' : '170px'
+  };
   const overlayStyle = {
     position: 'absolute', bottom: 0, left: 0, width: '100%',
     padding: '15px 12px',
@@ -117,7 +138,7 @@ const DestinasiPage = () => {
       <div style={{
         height: isMobile ? '280px' : '380px',
         backgroundImage: `url('${gambarDefault}')`,
-        backgroundSize: 'cover', backgroundPosition: isMobile ? 'center' : 'center',
+        backgroundSize: 'cover', backgroundPosition: 'center',
         position: 'relative'
       }}>
 
@@ -167,22 +188,22 @@ const DestinasiPage = () => {
 
       {/* TITLE */}
       <div
-  style={{
-    textAlign: 'center',
-    padding: isMobile ? '35px 6% 30px' : '50px 8% 40px'
-  }}
->
+        style={{
+          textAlign: 'center',
+          padding: isMobile ? '35px 6% 30px' : '50px 8% 40px'
+        }}
+      >
         <p style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '2px' }}>
           PESONA SULAWESI SELATAN
         </p>
         <h1
-  style={{
-    fontSize: isMobile ? '18px' : '26px',
-    fontWeight: '700',
-    marginTop: '10px',
-    lineHeight: '1.6'
-  }}
->
+          style={{
+            fontSize: isMobile ? '18px' : '26px',
+            fontWeight: '700',
+            marginTop: '10px',
+            lineHeight: '1.6'
+          }}
+        >
           Menelusuri Jejak Budaya dan Keajaiban Alam yang Tak Terlupakan.
         </h1>
       </div>
@@ -197,17 +218,13 @@ const DestinasiPage = () => {
         borderRadius: '25px',
         border: '3px solid #fff'
       }}>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile
-  ? 'repeat(2, 1fr)'
-  : 'repeat(3, 1fr)', gap: '20px' }}>
-            {kota.map((k, idx) => (
-              <div 
-                key={idx} 
-                onClick={() =>
-                  navigate(`/kabpage/${k.n}`)
-                }
-                style={baseCardStyle}
-              >
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '20px' }}>
+          {kota.map((k, idx) => (
+            <div 
+              key={idx} 
+              onClick={() => handleKotaClick(k.n)}
+              style={baseCardStyle}
+            >
               <img src={k.i} alt={k.n} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               <div style={overlayStyle}>{k.n}</div>
             </div>
@@ -222,7 +239,6 @@ const DestinasiPage = () => {
         </h2>
 
         <div style={{ display: 'flex', gap: '30px', overflowX: 'auto' }}>
-
           {topDestinasi.map((item, idx) => {
             const data = item.destinasi || item;
 
@@ -243,37 +259,36 @@ const DestinasiPage = () => {
                 }}
               >
                 {/* LOVE */}
-              <div
-                onClick={(e) => toggleFavorite(e, data)}
-                style={{
-                  position: 'absolute', 
-                  top: '15px', 
-                  right: '15px',
-                  backgroundColor: 'rgba(255,255,255,0.95)',
-                  width: '40px', 
-                  height: '40px',
-                  borderRadius: '50%',
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  zIndex: 10, // Pastikan z-index lebih tinggi
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                  // Menambahkan ini agar tidak terpotong saat berada di pojok
-                  margin: '5px' 
-                }}
-              >
-                <svg 
-                  width="22" height="22" viewBox="0 0 24 24"
-                  fill={favorites.includes(data._id) ? "#d93025" : "none"}
-                  stroke={favorites.includes(data._id) ? "#d93025" : "#333"}
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <div
+                  onClick={(e) => toggleFavorite(e, data)}
+                  style={{
+                    position: 'absolute', 
+                    top: '15px', 
+                    right: '15px',
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    width: '40px', 
+                    height: '40px',
+                    borderRadius: '50%',
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    zIndex: 10,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    margin: '5px' 
+                  }}
                 >
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-              </div>
+                  <svg 
+                    width="22" height="22" viewBox="0 0 24 24"
+                    fill={favorites.includes(data._id) ? "#d93025" : "none"}
+                    stroke={favorites.includes(data._id) ? "#d93025" : "#333"}
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                </div>
 
                 <img src={data.gambar || gambarDefault} alt={data.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 
@@ -297,7 +312,6 @@ const DestinasiPage = () => {
               </div>
             );
           })}
-
         </div>
       </div>
     </div>
