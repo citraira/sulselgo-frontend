@@ -6,7 +6,7 @@ const DestinasiPage = () => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
   
-  // 1. Inisialisasi langsung dari sessionStorage agar elemen kartu langsung eksis tanpa kedipan loading saat ditekan back
+  // Inisialisasi langsung dari sessionStorage agar elemen kartu langsung eksis tanpa kedipan loading saat ditekan back
   const [topDestinasi, setTopDestinasi] = useState(() => {
     const savedTop = sessionStorage.getItem("destinasi_preserved_top");
     return savedTop ? JSON.parse(savedTop) : [];
@@ -23,12 +23,24 @@ const DestinasiPage = () => {
     }
 
     const savedScrollY = sessionStorage.getItem("destinasi_scroll_pos");
-    if (topDestinasi.length > 0 && savedScrollY) {
+    const savedScrollX = sessionStorage.getItem("destinasi_horizontal_scroll_pos");
+
+    if (topDestinasi.length > 0) {
       // Paksa matikan animasi smooth global CSS browser sebelum scroll melompat
       document.documentElement.style.scrollBehavior = "auto";
       
-      window.scrollTo(0, parseInt(savedScrollY, 10));
-      sessionStorage.removeItem("destinasi_scroll_pos");
+      // 1. Pulihkan posisi scroll halaman vertikal (Y)
+      if (savedScrollY) {
+        window.scrollTo(0, parseInt(savedScrollY, 10));
+        sessionStorage.removeItem("destinasi_scroll_pos");
+      }
+
+      // 2. Pulihkan posisi scroll ke samping (X) pada container list destinasi teratas
+      const horizontalContainer = document.getElementById("horizontal-destinasi-list");
+      if (horizontalContainer && savedScrollX) {
+        horizontalContainer.scrollLeft = parseInt(savedScrollX, 10);
+        sessionStorage.removeItem("destinasi_horizontal_scroll_pos");
+      }
       
       setTimeout(() => {
         document.documentElement.style.scrollBehavior = "";
@@ -77,9 +89,16 @@ const DestinasiPage = () => {
     }
   };
 
-  // ================= NAVIGASI DESTINASI DENGAN REKAM SCROLL =================
+  // ================= NAVIGASI DESTINASI DENGAN REKAM SCROLL VERTIKAL & HORIZONTAL =================
   const handleClickDestinasi = (item) => {
     sessionStorage.setItem("destinasi_scroll_pos", window.scrollY);
+    
+    // Rekam seberapa jauh list horizontal sudah digeser ke samping sebelum pindah halaman
+    const horizontalContainer = document.getElementById("horizontal-destinasi-list");
+    if (horizontalContainer) {
+      sessionStorage.setItem("destinasi_horizontal_scroll_pos", horizontalContainer.scrollLeft);
+    }
+
     navigate("/detail", {
       state: item
     });
@@ -234,11 +253,16 @@ const DestinasiPage = () => {
 
       {/* TOP DESTINASI */}
       <div style={{ padding: '60px 5% 100px' }}>
-        <h2 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '800', marginBottom: '45px' }}>
+        {/* PERBAIKAN: Mengurangi marginBottom dari 45px menjadi 20px agar rapat dan rapi */}
+        <h2 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '800', marginBottom: '20px' }}>
           5 Destinasi Teratas
         </h2>
 
-        <div style={{ display: 'flex', gap: '30px', overflowX: 'auto' }}>
+        {/* PERBAIKAN: Menambahkan ID unik id="horizontal-destinasi-list" untuk menangkap koordinat scroll horizontal */}
+        <div 
+          id="horizontal-destinasi-list" 
+          style={{ display: 'flex', gap: '30px', overflowX: 'auto' }}
+        >
           {topDestinasi.map((item, idx) => {
             const data = item.destinasi || item;
 
