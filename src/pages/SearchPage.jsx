@@ -281,7 +281,7 @@ export default function SearchPage() {
             }}
           >
             Temukan pantai indah, wisata budaya,
-            pegunungan, dan destinasi terbaik
+            bagaimana pun, dan destinasi terbaik
             di Sulawesi Selatan.
           </p>
 
@@ -299,7 +299,6 @@ export default function SearchPage() {
               backdropFilter: "blur(15px)",
               zIndex: 999,
               marginTop: isMobile ? "16px" : "0",
-              marginBottom: isMobile ? "" : "0",
             }}
           >
             
@@ -386,7 +385,7 @@ export default function SearchPage() {
         <div
           style={{
             width: "88%",
-            margin: isMobile ? "80px auto 50px" : "50px auto"
+            margin: isMobile ? "24px auto 50px" : "50px auto"
           }}
         >
           <div
@@ -864,4 +863,3 @@ export default function SearchPage() {
     </div>
   );
 }
-
