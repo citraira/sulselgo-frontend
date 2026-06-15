@@ -4,7 +4,13 @@ import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [slides, setSlides] = useState([]);
+  
+  // 1. Inisialisasi slides langsung dari sessionStorage jika ada, agar halaman tidak kosong saat tombol back ditekan
+  const [slides, setSlides] = useState(() => {
+    const savedSlides = sessionStorage.getItem("landing_preserved_slides");
+    return savedSlides ? JSON.parse(savedSlides) : [];
+  });
+  
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   useEffect(() => {
@@ -53,20 +59,29 @@ const LandingPage = () => {
 
   }, [changeSlider, slides.length]);
 
-  // AMBIL TOP DESTINASI + MATIKAN SCROLL RESTORATION BAWAAN BROWSER
+  // AMBIL DATA API + KONTROL SCROLL MANUAL
   useEffect(() => {
-    // MEMAKSA BROWSER UNTUK TIDAK MELAKUKAN SCROLL OTOMATIS BAWAAN (MATI TOTAL)
+    // Matikan pemulihan scroll otomatis bawaan browser agar tidak merusak koordinat murni kita
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
+    }
+
+    // Jika slides sudah ada di cache lokal (dari tombol back), langsung pulihkan posisi scroll secara instan tanpa menunggu API
+    const savedScrollY = sessionStorage.getItem("landing_scroll_pos");
+    if (slides.length > 0 && savedScrollY) {
+      window.scrollTo(0, parseInt(savedScrollY, 10));
+      sessionStorage.removeItem("landing_scroll_pos");
     }
 
     API.get("/top-destinasi")
       .then((res) => {
         console.log("DATA API:", res.data);
         setSlides(res.data);
+        
+        // Simpan data terbaru ke cache session untuk keperluan tombol back berikutnya
+        sessionStorage.setItem("landing_preserved_slides", JSON.stringify(res.data));
 
-        // Ambil posisi terakhir dan tempatkan seketika tanpa perantara animasi browser
-        const savedScrollY = sessionStorage.getItem("landing_scroll_pos");
+        // Jika baru dimuat atau cache slides diperbarui, pastikan scroll tetap di posisi yang benar
         if (savedScrollY) {
           window.scrollTo(0, parseInt(savedScrollY, 10));
           sessionStorage.removeItem("landing_scroll_pos");
@@ -78,7 +93,7 @@ const LandingPage = () => {
 
   }, []);
 
-  // FUNGSI NAVIGASI DENGAN MENYIMPAN POSISI SCROLL
+  // FUNGSI NAVIGASI DENGAN MENYIMPAN KOORDINAT SCROLL
   const handleCardClick = (item) => {
     sessionStorage.setItem("landing_scroll_pos", window.scrollY);
     navigate("/detail", { state: item });
