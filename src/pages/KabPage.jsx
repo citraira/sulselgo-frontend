@@ -37,16 +37,21 @@ const KabPage = () => {
     decodeURIComponent(kabupaten || "Bantaeng")
   );
 
-  // 1. Inisialisasi daftar destinasi langsung dari sessionStorage jika ada cache-nya
+  // Inisialisasi daftar destinasi langsung dari cache jika ada
   const [destinasiList, setDestinasiList] = useState(() => {
     const savedList = sessionStorage.getItem(`kab_destinasi_${selectedKab}`);
     return savedList ? JSON.parse(savedList) : [];
   });
   
-  const [showSidebar, setShowSidebar] = useState(true);
+  // PERBAIKAN SIDEBAR: Membaca status terakhir sidebar dari session cache (default true jika belum ada)
+  const [showSidebar, setShowSidebar] = useState(() => {
+    const savedSidebar = sessionStorage.getItem("kab_sidebar_show_status");
+    return savedSidebar ? savedSidebar === "opened" : true;
+  });
+
   const navigate = useNavigate();
 
-  // 2. Mengontrol pemulihan posisi scroll konten dan sidebar tanpa animasi luncuran
+  // Mengontrol pemulihan posisi scroll konten, sidebar, dan mematikan animasi luncuran
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
@@ -58,7 +63,7 @@ const KabPage = () => {
     // Matikan efek smooth global browser secara instan
     document.documentElement.style.scrollBehavior = "auto";
 
-    // Kembalikan posisi scroll area konten utama jika element sudah siap
+    // Kembalikan posisi scroll area konten utama
     const mainContentArea = document.getElementById("main-content-area");
     if (mainContentArea && savedMainScroll) {
       mainContentArea.scrollTop = parseInt(savedMainScroll, 10);
@@ -83,8 +88,6 @@ const KabPage = () => {
       .then((res) => {
         const data = res.data;
         setDestinasiList(data);
-        
-        // Simpan ke cache lokal agar saat ditekan back, element kartu langsung eksis tanpa kedipan loading
         sessionStorage.setItem(`kab_destinasi_${selectedKab}`, JSON.stringify(data));
       })
       .catch((err) =>
@@ -92,7 +95,7 @@ const KabPage = () => {
       );
   }, [selectedKab]);
 
-  // 3. Tangkap dan amankan data koordinat scroll sebelum melompat ke detail page
+  // Tangkap data koordinat scroll sebelum melompat ke detail page
   const handleDetail = (item) => {
     const mainContentArea = document.getElementById("main-content-area");
     const sidebarScrollArea = document.getElementById("sidebar-scroll-area");
@@ -103,14 +106,20 @@ const KabPage = () => {
     if (sidebarScrollArea) {
       sessionStorage.setItem("kab_sidebar_scroll_pos", sidebarScrollArea.scrollTop);
     }
+    
+    // Simpan status terkini dari sidebar sebelum pindah halaman
+    sessionStorage.setItem("kab_sidebar_show_status", showSidebar ? "opened" : "closed");
 
     navigate("/detail", {
       state: item
     });
   };
 
+  // Fungsi toggle sidebar dengan penyimpanan status ter-update
   const toggleSidebar = () => {
-    setShowSidebar(!showSidebar);
+    const nextStatus = !showSidebar;
+    setShowSidebar(nextStatus);
+    sessionStorage.setItem("kab_sidebar_show_status", nextStatus ? "opened" : "closed");
   };
 
   return (
@@ -125,7 +134,7 @@ const KabPage = () => {
     }}>
 
     <div
-      onClick={() => setShowSidebar(!showSidebar)}
+      onClick={toggleSidebar}
       style={{
         position: "fixed",
         top: "50%",
@@ -240,7 +249,7 @@ const KabPage = () => {
             style={{
               display: "grid",
               gridTemplateColumns:
-                "repeat(auto-fit, minmax(280px, 1fr))",
+                "repeat(auto-fill, minmax(280px, 1fr))",
               gap: "25px",
               transition: "0.4s"
             }}
