@@ -236,7 +236,7 @@ export default function SearchPage() {
       
       <div
         style={{
-          height: isMobile ? "300px" : "420px",
+          height: isMobile ? "340px" : "420px",
           width: "100%",
           background:
             "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781029397/sulselgo/k5ptrmeg8u3mzniztyws.png')",
@@ -249,7 +249,7 @@ export default function SearchPage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          paddingTop: isMobile ? "65px" : "80px",
+          paddingTop: isMobile ? "110px" : "80px",
         }}
       >
         <div
@@ -298,7 +298,7 @@ export default function SearchPage() {
               boxShadow: "0 12px 35px rgba(0,0,0,0.22)",
               backdropFilter: "blur(15px)",
               zIndex: 999,
-              marginTop: isMobile ? "16px" : "0",
+              marginTop: isMobile ? "28px" : "0",
               width: "100%"
             }}
           >
