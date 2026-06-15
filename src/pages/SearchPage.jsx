@@ -236,7 +236,7 @@ export default function SearchPage() {
       
       <div
         style={{
-          height: isMobile ? "340px" : "420px",
+          height: isMobile ? "300px" : "420px",
           width: "100%",
           background:
             "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('https://res.cloudinary.com/dnxo5qbrg/image/upload/f_auto,q_auto,w_800/v1781029397/sulselgo/k5ptrmeg8u3mzniztyws.png')",
@@ -249,7 +249,7 @@ export default function SearchPage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          paddingTop: isMobile ? "90px" : "80px",
+          paddingTop: isMobile ? "65px" : "80px",
         }}
       >
         <div
@@ -260,10 +260,10 @@ export default function SearchPage() {
         >
         <h1
           style={{
-            fontSize: isMobile ? "26px" : "72px",
+            fontSize: isMobile ? "22px" : "72px",
             fontWeight: "700",
-            lineHeight: "1.15",
-            marginBottom: "16px",
+            lineHeight: "1.2",
+            marginBottom: "8px",
             color: "#fff",
             marginLeft: "0",
             maxWidth: "100%",
@@ -275,9 +275,9 @@ export default function SearchPage() {
             style={{
               color: "rgba(255,255,255,0.9)",
               fontSize: isMobile ? "14px" : "18px",
-              marginBottom: isMobile ? "22px" : "10px",
+              marginBottom: isMobile ? "14px" : "10px",
               maxWidth: "600px",
-              lineHeight: "1.8"
+              lineHeight: "1.6"
             }}
           >
             Temukan pantai indah, wisata budaya,
@@ -299,6 +299,7 @@ export default function SearchPage() {
               backdropFilter: "blur(15px)",
               zIndex: 999,
               marginTop: isMobile ? "16px" : "0",
+              width: "100%"
             }}
           >
             
