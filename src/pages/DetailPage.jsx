@@ -30,11 +30,15 @@ const DetailPage = () => {
   const [dislikeCounts, setDislikeCounts] = useState({}); 
   const [showAllReviews, setShowAllReviews] = useState(false);
 
-  // ================= PERBAIKAN SCROLL TO TOP =================
+  // ================= PERBAIKAN SCROLL INSTAN TANPA TRANSISI =================
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant" // Memaksa halaman langsung berada di atas tanpa animasi
+    });
   }, [state]);
-  // ===========================================================
+  // ==========================================================================
 
   const nextImage = () => {
   const next =
