@@ -53,7 +53,7 @@ const LandingPage = () => {
 
   }, [changeSlider, slides.length]);
 
-  // AMBIL TOP DESTINASI + PEMULIHAN SCROLL INSTAN
+  // AMBIL TOP DESTINASI + PEMULIHAN SCROLL TANPA TRANSISI SAMA SEKALI
   useEffect(() => {
 
     API.get("/top-destinasi")
@@ -61,16 +61,11 @@ const LandingPage = () => {
         console.log("DATA API:", res.data);
         setSlides(res.data);
 
-        // Ambil posisi scroll terakhir setelah data selesai dimuat sepenuhnya
+        // Eksekusi pemulihan koordinat secara langsung tanpa objek behavior
         const savedScrollY = sessionStorage.getItem("landing_scroll_pos");
         if (savedScrollY) {
-          setTimeout(() => {
-            window.scrollTo({
-              top: parseInt(savedScrollY, 10),
-              behavior: "instant" // Mengembalikan posisi scroll instan tanpa transisi gerakan
-            });
-            sessionStorage.removeItem("landing_scroll_pos"); // Hapus data setelah digunakan
-          }, 0);
+          window.scrollTo(0, parseInt(savedScrollY, 10)); // Langsung lompat ke koordinat y seketika
+          sessionStorage.removeItem("landing_scroll_pos");
         }
       })
       .catch((err) => {
@@ -79,9 +74,9 @@ const LandingPage = () => {
 
   }, []);
 
-  // FUNGSI NAVIGASI AMAN DENGAN MENYIMPAN POSISI SCROLL
+  // FUNGSI NAVIGASI DENGAN MENYIMPAN POSISI SCROLL
   const handleCardClick = (item) => {
-    sessionStorage.setItem("landing_scroll_pos", window.scrollY); // Catat koordinat y terakhir
+    sessionStorage.setItem("landing_scroll_pos", window.scrollY);
     navigate("/detail", { state: item });
   };
 
