@@ -37,39 +37,81 @@ const KabPage = () => {
     decodeURIComponent(kabupaten || "Bantaeng")
   );
 
-  const [destinasiList, setDestinasiList] = useState([]);
+  // 1. Inisialisasi daftar destinasi langsung dari sessionStorage jika ada cache-nya
+  const [destinasiList, setDestinasiList] = useState(() => {
+    const savedList = sessionStorage.getItem(`kab_destinasi_${selectedKab}`);
+    return savedList ? JSON.parse(savedList) : [];
+  });
+  
   const [showSidebar, setShowSidebar] = useState(true);
-
   const navigate = useNavigate();
 
-useEffect(() => {
+  // 2. Mengontrol pemulihan posisi scroll konten dan sidebar tanpa animasi luncuran
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
 
-  API.get(`/destinasi/wilayah/${selectedKab}`)
-    .then((res) => {
+    const savedMainScroll = sessionStorage.getItem("kab_main_scroll_pos");
+    const savedSidebarScroll = sessionStorage.getItem("kab_sidebar_scroll_pos");
+    
+    // Matikan efek smooth global browser secara instan
+    document.documentElement.style.scrollBehavior = "auto";
 
-      const data = res.data;
+    // Kembalikan posisi scroll area konten utama jika element sudah siap
+    const mainContentArea = document.getElementById("main-content-area");
+    if (mainContentArea && savedMainScroll) {
+      mainContentArea.scrollTop = parseInt(savedMainScroll, 10);
+      sessionStorage.removeItem("kab_main_scroll_pos");
+    }
 
-      setDestinasiList(data);
+    // Kembalikan posisi scroll kontainer tombol di sidebar
+    const sidebarScrollArea = document.getElementById("sidebar-scroll-area");
+    if (sidebarScrollArea && savedSidebarScroll) {
+      sidebarScrollArea.scrollTop = parseInt(savedSidebarScroll, 10);
+      sessionStorage.removeItem("kab_sidebar_scroll_pos");
+    }
 
-    })
-    .catch((err) =>
-      console.error(
-        "Gagal mengambil destinasi:",
-        err
-      )
-    );
+    // Hidupkan kembali setelan bawaan CSS setelah koordinat melompat
+    setTimeout(() => {
+      document.documentElement.style.scrollBehavior = "";
+    }, 50);
+  }, [destinasiList, selectedKab]);
 
-}, [selectedKab]);
+  useEffect(() => {
+    API.get(`/destinasi/wilayah/${selectedKab}`)
+      .then((res) => {
+        const data = res.data;
+        setDestinasiList(data);
+        
+        // Simpan ke cache lokal agar saat ditekan back, element kartu langsung eksis tanpa kedipan loading
+        sessionStorage.setItem(`kab_destinasi_${selectedKab}`, JSON.stringify(data));
+      })
+      .catch((err) =>
+        console.error("Gagal mengambil destinasi:", err)
+      );
+  }, [selectedKab]);
 
-const handleDetail = (item) => {
-  navigate("/detail", {
-    state: item
-  });
-};
+  // 3. Tangkap dan amankan data koordinat scroll sebelum melompat ke detail page
+  const handleDetail = (item) => {
+    const mainContentArea = document.getElementById("main-content-area");
+    const sidebarScrollArea = document.getElementById("sidebar-scroll-area");
 
-const toggleSidebar = () => {
-  setShowSidebar(!showSidebar);
-};
+    if (mainContentArea) {
+      sessionStorage.setItem("kab_main_scroll_pos", mainContentArea.scrollTop);
+    }
+    if (sidebarScrollArea) {
+      sessionStorage.setItem("kab_sidebar_scroll_pos", sidebarScrollArea.scrollTop);
+    }
+
+    navigate("/detail", {
+      state: item
+    });
+  };
+
+  const toggleSidebar = () => {
+    setShowSidebar(!showSidebar);
+  };
 
   return (
     <div style={{ 
@@ -126,12 +168,12 @@ const toggleSidebar = () => {
           backgroundColor: "#800000",
           color: "#fff",
           display: "flex",
-          flexDirection: "column", // Membagi judul dan list secara vertikal
+          flexDirection: "column",
           height: "100%",
           flexShrink: 0,
         }}
       >
-        {/* Judul Sidebar - Statis (Tidak ikut scroll) */}
+        {/* Judul Sidebar - Statis */}
         <div style={{ padding: "25px 20px 15px 20px" }}>
           <h3 style={{ margin: 0, fontSize: "18px", lineHeight: "1.4" }}>
             Kota/Kabupaten di Sulawesi Selatan
@@ -140,6 +182,7 @@ const toggleSidebar = () => {
 
         {/* Daftar Tombol - Scrollable */}
         <div
+          id="sidebar-scroll-area"
           style={{
             flex: 1,
             overflowY: "scroll",
@@ -176,13 +219,16 @@ const toggleSidebar = () => {
       </div>
 
       {/* AREA KONTEN UTAMA */}
-      <div style={{ 
-        flex: 1, 
-        padding: "40px", 
-        background: "#f5f5f5", 
-        overflowY: "auto", 
-        height: "100%" 
-      }}>
+      <div 
+        id="main-content-area"
+        style={{ 
+          flex: 1, 
+          padding: "40px", 
+          background: "#f5f5f5", 
+          overflowY: "auto", 
+          height: "100%" 
+        }}
+      >
         <h2 style={{ marginBottom: "30px", fontSize: "32px", fontWeight: "bold" }}>
           {selectedKab}
         </h2>
@@ -202,7 +248,7 @@ const toggleSidebar = () => {
               {destinasiList.map((item, index) => (
                 <div
                   key={item._id || index}
-                onClick={() => handleDetail(item)}
+                  onClick={() => handleDetail(item)}
                   style={{
                     width: "100%",
                     maxWidth: "320px",
@@ -215,9 +261,9 @@ const toggleSidebar = () => {
                     transition: "transform 0.2s ease",
                     margin: "0 auto"
                   }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.02)"}
-                onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
-              >
+                  onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.02)"}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                >
                 <img
                   src={item.gambar.replace(
                     "/upload/",
