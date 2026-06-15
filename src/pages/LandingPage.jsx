@@ -6,6 +6,7 @@ const LandingPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slides, setSlides] = useState([]);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -52,7 +53,7 @@ const LandingPage = () => {
 
   }, [changeSlider, slides.length]);
 
-  // AMBIL TOP DESTINASI
+  // AMBIL TOP DESTINASI + PEMULIHAN SCROLL INSTAN
   useEffect(() => {
 
     API.get("/top-destinasi")
@@ -60,17 +61,29 @@ const LandingPage = () => {
         console.log("DATA API:", res.data);
         setSlides(res.data);
 
+        // Ambil posisi scroll terakhir setelah data selesai dimuat sepenuhnya
+        const savedScrollY = sessionStorage.getItem("landing_scroll_pos");
+        if (savedScrollY) {
+          setTimeout(() => {
+            window.scrollTo({
+              top: parseInt(savedScrollY, 10),
+              behavior: "instant" // Mengembalikan posisi scroll instan tanpa transisi gerakan
+            });
+            sessionStorage.removeItem("landing_scroll_pos"); // Hapus data setelah digunakan
+          }, 0);
+        }
       })
       .catch((err) => {
-
-        console.log(
-          "Gagal mengambil top destinasi:",
-          err
-        );
-
+        console.log("Gagal mengambil top destinasi:", err);
       });
 
   }, []);
+
+  // FUNGSI NAVIGASI AMAN DENGAN MENYIMPAN POSISI SCROLL
+  const handleCardClick = (item) => {
+    sessionStorage.setItem("landing_scroll_pos", window.scrollY); // Catat koordinat y terakhir
+    navigate("/detail", { state: item });
+  };
 
   return (
     <div
@@ -90,7 +103,7 @@ const LandingPage = () => {
           transition: transform 0.2s;
           display: flex;
           align-items: center;
-          justify-content: center;
+          justifyContent: center;
           width: 30px;
           height: 30px;
         }
@@ -230,7 +243,6 @@ const LandingPage = () => {
             margin: '0 auto 60px'
           }}
         >
-          
           Nikmati harmoni alam, budaya, dan kuliner legendaris.
         </p>
         
@@ -249,91 +261,85 @@ const LandingPage = () => {
         slides.slice(0, 4).map((item, i) => (
           <div
             key={i}
-            onClick={() =>
-              navigate("/detail", {
-                state: item
-              })
-            }
-          
+            onClick={() => handleCardClick(item)}
+            style={{
+              height: isMobile ? '320px' : '450px',
+
+              borderRadius: '25px',
+
+              overflow: 'hidden',
+
+              position: 'relative',
+
+              boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+
+              cursor: 'pointer'
+            }}
+          >
+
+            <img
+              src={item.gambar}
+              alt={item.nama}
 
               style={{
-                height: isMobile ? '320px' : '450px',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
 
-                borderRadius: '25px',
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
 
-                overflow: 'hidden',
+                width: '100%',
 
-                position: 'relative',
+                padding: '30px',
 
-                boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                background:
+                  'linear-gradient(transparent, rgba(0,0,0,0.95))',
 
-                cursor: 'pointer'
+                textAlign: 'left'
               }}
             >
 
-              <img
-                src={item.gambar}
-                alt={item.nama}
-
+              <h3
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-              />
-
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-
-                  width: '100%',
-
-                  padding: '30px',
-
-                  background:
-                    'linear-gradient(transparent, rgba(0,0,0,0.95))',
-
-                  textAlign: 'left'
+                  margin: 0,
+                  fontSize: '22px',
+                  fontWeight: '600'
                 }}
               >
+                {item.nama}
+              </h3>
 
-                <h3
-                  style={{
-                    margin: 0,
-                    fontSize: '22px',
-                    fontWeight: '600'
-                  }}
-                >
-                  {item.nama}
-                </h3>
+              <p
+                style={{
+                  fontSize: '14px',
+                  margin: '8px 0 0',
+                  opacity: 0.85
+                }}
+              >
+                📍 {item.kabupaten}
+              </p>
 
-                <p
-                  style={{
-                    fontSize: '14px',
-                    margin: '8px 0 0',
-                    opacity: 0.85
-                  }}
-                >
-                  📍 {item.kabupaten}
-                </p>
+              <p
+                style={{
+                  fontSize: '14px',
+                  marginTop: '10px',
+                  color: '#ffd700',
+                  fontWeight: '600'
+                }}
+              >
+                ⭐ {item.avgRating?.toFixed(1) || "0"} •{" "}
+                {item.totalReview || 0} ulasan
+              </p>
 
-                <p
-                  style={{
-                    fontSize: '14px',
-                    marginTop: '10px',
-                    color: '#ffd700',
-                    fontWeight: '600'
-                  }}
-                >
-                  ⭐ {item.avgRating?.toFixed(1) || "0"} •{" "}
-                  {item.totalReview || 0} ulasan
-                </p>
-
-              </div>
             </div>
+          </div>
 
-          ))}
+        ))}
 
         </div>
       </div>
