@@ -69,7 +69,7 @@ const PanduanPage = () => {
           position: "relative",
           height: isMobile ? "220px" : "270px",
           backgroundImage:
-            "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55)), url('/tanjung bira.jpg')",
+            "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55)), url('https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781029397/sulselgo/k5ptrmeg8u3mzniztyws.png')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           display: "flex",
