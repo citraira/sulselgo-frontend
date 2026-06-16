@@ -110,6 +110,13 @@ const LandingPage = () => {
     sessionStorage.setItem("landing_scroll_pos", window.scrollY);
     navigate("/detail", { state: item });
   };
+  const handleHeroClick = () => {
+  if (!slides[currentIndex]) return;
+
+  navigate("/detail", {
+    state: slides[currentIndex]
+  });
+};
 
   return (
     <div
@@ -142,6 +149,7 @@ const LandingPage = () => {
       {/* HERO SECTION */}
       <div
         style={{
+          position: "relative",
           height: isMobile ? '60vh' : '85vh',
           width: '100%',
           margin: 0,
@@ -160,15 +168,31 @@ const LandingPage = () => {
 
           paddingBottom: isMobile ? '20px' : '50px',
 
+          cursor: 'pointer',
+
           transition: 'background-image 0.8s ease-in-out'
         }}
       >
 
+      <div
+        onClick={handleHeroClick}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: "110px",
+          cursor: "pointer",
+          zIndex: 1
+        }}
+      />
         {/* SLIDER INDICATOR */}
         <div
           style={{
+            position: "relative",
+            zIndex: 2,
+
             background: 'rgba(0,0,0,0.5)',
-            color: '#fff',
 
             padding: isMobile ? '10px 15px' : '12px 25px',
 
@@ -188,12 +212,18 @@ const LandingPage = () => {
             boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
           }}
         >
-          <div
-            className="slider-arrow"
-            onClick={() => changeSlider(-1)}
-          >
-            ❮
-          </div>
+        <div
+          className="slider-arrow"
+          onClick={(e) => {
+            e.stopPropagation();
+            changeSlider(-1);
+          }}
+          style={{
+            color: "#fff"
+          }}
+        >
+          ❮
+        </div>
 
           <div
             style={{
@@ -203,10 +233,17 @@ const LandingPage = () => {
             }}
           >
             <span
+              onClick={(e) => {
+                e.stopPropagation();
+                handleHeroClick();
+              }}
               style={{
                 fontWeight: '600',
                 fontSize: '15px',
-                letterSpacing: '0.5px'
+                letterSpacing: '0.5px',
+                color: '#fff',
+                cursor: 'pointer',
+                display: 'inline-block'
               }}
             >
               {slides[currentIndex]?.nama}
@@ -215,7 +252,13 @@ const LandingPage = () => {
 
           <div
             className="slider-arrow"
-            onClick={() => changeSlider(1)}
+            onClick={(e) => {
+              e.stopPropagation();
+              changeSlider(1);
+            }}
+            style={{
+              color: "#fff"
+            }}
           >
             ❯
           </div>
