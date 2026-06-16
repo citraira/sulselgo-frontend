@@ -158,7 +158,7 @@ useEffect(() => {
         }}
       >
         <img
-          src="/leang leang.jpg"
+          src="https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781029397/sulselgo/k5ptrmeg8u3mzniztyws.png"
           alt="Header Profil"
           style={{
             width: "100%",
