@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 
@@ -23,6 +23,13 @@ const DetailPage = () => {
   const [zoom, setZoom] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
   const [hoverHapus, setHoverHapus] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [hoverSide, setHoverSide] = useState(null); // "left" | "right" | null
+  
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
   const [showEditForm, setShowEditForm] = useState(false);
   const [editReviewId, setEditReviewId] = useState(null);
   const [editRatingInput, setEditRatingInput] = useState(0);
@@ -38,6 +45,18 @@ const DetailPage = () => {
       behavior: "instant" // Memaksa halaman langsung berada di atas tanpa animasi
     });
   }, [state]);
+
+  useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  window.addEventListener("resize", handleResize);
+
+  return () => {
+    window.removeEventListener("resize", handleResize);
+  };
+}, []);
   // ==========================================================================
 
   const nextImage = () => {
@@ -65,6 +84,50 @@ const zoomIn = () => {
 
 const zoomOut = () => {
   setZoom((prev) => Math.max(prev - 0.2, 1));
+};
+
+useEffect(() => {
+  if (!selectedImage || isMobile) return;
+
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowRight") {
+      nextImage();
+    }
+
+    if (e.key === "ArrowLeft") {
+      prevImage();
+    }
+
+    if (e.key === "Escape") {
+      setSelectedImage(null);
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+}, [selectedImage, isMobile, currentImageIndex]);
+
+const handleTouchStart = (e) => {
+  touchStartX.current = e.touches[0].clientX;
+};
+
+const handleTouchMove = (e) => {
+  touchEndX.current = e.touches[0].clientX;
+};
+
+const handleTouchEnd = () => {
+  const diff = touchStartX.current - touchEndX.current;
+
+  if (Math.abs(diff) < 50) return;
+
+  if (diff > 0) {
+    nextImage();
+  } else {
+    prevImage();
+  }
 };
 
   if (!state) {
@@ -1315,6 +1378,9 @@ const handleSimpanEdit = async () => {
 {selectedImage && (
   <div
     onClick={() => setSelectedImage(null)}
+    onTouchStart={handleTouchStart}
+    onTouchMove={handleTouchMove}
+    onTouchEnd={handleTouchEnd}
     style={{
       position: "fixed",
       top: 0,
@@ -1329,68 +1395,108 @@ const handleSimpanEdit = async () => {
       overflow: "hidden"
     }}
   >
-    {/* Tombol Sebelumnya */}
-      {!isZoomed && (
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          prevImage();
-        }}
-        style={{
-          position: "absolute",
-          left: "20px",
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: window.innerWidth <= 768 ? "45px" : "60px",
-          height: window.innerWidth <= 768 ? "45px" : "60px",
-          borderRadius: "50%",
-          border: "none",
-          background:
-            window.innerWidth <= 768
-              ? "rgba(255,255,255,0.35)"
-              : "rgba(255,255,255,0.95)",
-          backdropFilter: "blur(4px)",
-          fontSize: window.innerWidth <= 768 ? "28px" : "40px",
-          color: "#333",
-          cursor: "pointer",
-          zIndex: 10001,
-        }}
-      >
-        ‹
-      </button>
-    )}
 
-    {/* Tombol Berikutnya */}
-      {!isZoomed && (
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          nextImage();
-        }}
-        style={{
-          position: "absolute",
-          right: "20px",
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: window.innerWidth <= 768 ? "45px" : "60px",
-          height: window.innerWidth <= 768 ? "45px" : "60px",
-          borderRadius: "50%",
-          border: "none",
-          background:
-            window.innerWidth <= 768
-              ? "rgba(255,255,255,0.35)"
-              : "rgba(255,255,255,0.95)",
-          backdropFilter: "blur(4px)",
-          fontSize: window.innerWidth <= 768 ? "28px" : "40px",
-          color: "#333",
-          cursor: "pointer",
-          zIndex: 10001,
-        }}
-      >
-        ›
-      </button>
-    )}
+{!isMobile && (
+  <div
+    onMouseEnter={() => setHoverSide("left")}
+    onMouseLeave={() => setHoverSide(null)}
+    onClick={(e) => {
+      e.stopPropagation();
+      prevImage();
+    }}
+    style={{
+      position: "absolute",
+      left: 0,
+      top: 0,
+      width: "25%",
+      height: "100%",
+      zIndex: 10000,
+      cursor: "default"
+    }}
+  >
+  {hoverSide === "left" && (
+  <div
+    style={{
+      position: "absolute",
+      left: "24px",
+      top: "50%",
+      transform: "translateY(-50%)",
+      width: "32px",
+      height: "32px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "transparent",
+      border: "none",
+      boxShadow: "none"
+    }}
+  >
+    <span
+      style={{
+        color: "#fff",
+        fontSize: "30px",
+        fontWeight: "700",
+        lineHeight: 1,
+        textShadow: "0 2px 8px rgba(0,0,0,0.8)"
+      }}
+    >
+      ‹
+    </span>
+  </div>
+)}
+  </div>
+)}
 
+{!isMobile && (
+  <div
+    onMouseEnter={() => setHoverSide("right")}
+    onMouseLeave={() => setHoverSide(null)}
+    onClick={(e) => {
+      e.stopPropagation();
+      nextImage();
+    }}
+    style={{
+      position: "absolute",
+      right: 0,
+      top: 0,
+      width: "25%",
+      height: "100%",
+      zIndex: 10000,
+      cursor: "default"
+    }}
+  >
+ {hoverSide === "right" && (
+  <div
+    style={{
+      position: "absolute",
+      right: "24px",
+      top: "50%",
+      transform: "translateY(-50%)",
+      width: "32px",
+      height: "32px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "transparent",
+      border: "none",
+      boxShadow: "none"
+    }}
+  >
+    <span
+      style={{
+        color: "#fff",
+        fontSize: "30px",
+        fontWeight: "700",
+        lineHeight: 1,
+        textShadow: "0 2px 8px rgba(0,0,0,0.8)"
+      }}
+    >
+      ›
+    </span>
+  </div>
+)}
+  </div>
+)}
     {/* Gambar */}
       <img
         src={selectedImage}
