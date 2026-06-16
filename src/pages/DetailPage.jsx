@@ -1517,61 +1517,79 @@ const handleSimpanEdit = async () => {
       />
 
     {/* Tombol Zoom */}
-    <div
-      style={{
-        position: "absolute",
-        bottom: "30px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        display: "flex",
-        gap: "15px",
-        zIndex: 10001
-      }}
-    >
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          zoomOut();
-        }}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
         style={{
-          width: "55px",
-          height: "55px",
-          borderRadius: "50%",
-          border: "none",
-          background: "#fff",
-          fontSize: "32px",
-          fontWeight: "bold",
-          cursor: "pointer",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+          position: "absolute",
+          bottom: "30px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          gap: "15px",
+          zIndex: 10001
         }}
       >
-        −
-      </button>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            zoomOut();
+          }}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => e.stopPropagation()}
+          style={{
+            width: "55px",
+            height: "55px",
+            borderRadius: "50%",
+            border: "none",
+            background: "#fff",
+            fontSize: "32px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+          }}
+        >
+          −
+        </button>
 
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          zoomIn();
-        }}
-        style={{
-          width: "55px",
-          height: "55px",
-          borderRadius: "50%",
-          border: "none",
-          background: "#fff",
-          fontSize: "32px",
-          fontWeight: "bold",
-          cursor: "pointer",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
-        }}
-      >
-        +
-      </button>
-    </div>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            zoomIn();
+          }}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => e.stopPropagation()}
+          style={{
+            width: "55px",
+            height: "55px",
+            borderRadius: "50%",
+            border: "none",
+            background: "#fff",
+            fontSize: "32px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+          }}
+        >
+          +
+        </button>
+      </div>
 
     {/* Tombol Tutup */}
     <button
-      onClick={() => setSelectedImage(null)}
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelectedImage(null);
+      }}
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onTouchEnd={(e) => e.stopPropagation()}
       style={{
         position: "absolute",
         top: "20px",
