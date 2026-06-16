@@ -655,7 +655,7 @@ useEffect(() => {
                       style={{
                         flex: 1,
                         minWidth: isMobile ? "100%" : "180px",
-                        padding: "15px 18px",
+                        padding: isMobile ? "13px 16px" : "15px 18px",
                         borderRadius: "16px",
                         border: "none",
                         background: "linear-gradient(135deg, #8b0000, #b41515)",
