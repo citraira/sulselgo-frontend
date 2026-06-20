@@ -253,12 +253,10 @@ const DestinasiPage = () => {
 
       {/* TOP DESTINASI */}
       <div style={{ padding: '60px 5% 100px' }}>
-        {/* PERBAIKAN: Mengurangi marginBottom dari 45px menjadi 20px agar rapat dan rapi */}
         <h2 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '800', marginBottom: '20px' }}>
           5 Destinasi Teratas
         </h2>
 
-        {/* PERBAIKAN: Menambahkan ID unik id="horizontal-destinasi-list" untuk menangkap koordinat scroll horizontal */}
         <div 
           id="horizontal-destinasi-list" 
           style={{ display: 'flex', gap: '30px', overflowX: 'auto' }}
@@ -316,20 +314,30 @@ const DestinasiPage = () => {
 
                 <img src={data.gambar || gambarDefault} alt={data.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 
+                {/* OVERLAY TEKS DENGAN JUMLAH ULASAN */}
                 <div style={{
                   position: 'absolute',
                   bottom: 0,
                   color: '#fff',
-                  padding: '20px'
+                  padding: '20px',
+                  width: '100%',
+                  background: 'linear-gradient(transparent, rgba(0,0,0,0.85))',
+                  boxSizing: 'border-box'
                 }}>
                   <div style={{ fontSize: isMobile ? '18px' : '22px', fontWeight: '800' }}>
                     {data.nama}
                   </div>
-                  <div>
-                    {data.kabupaten}
+                  <div style={{ opacity: 0.85, fontSize: '14px', marginTop: '2px' }}>
+                    📍 {data.kabupaten}
                   </div>
-                  <div>
-                    ⭐ {item.avgRating ? item.avgRating.toFixed(1) : "-"}
+                  {/* PERBAIKAN: Menampilkan Rating Bintang beserta Total Ulasan seperti LandingPage */}
+                  <div style={{
+                    fontSize: '14px',
+                    marginTop: '6px',
+                    color: '#ffd700',
+                    fontWeight: '600'
+                  }}>
+                    ⭐ {item.avgRating ? item.avgRating.toFixed(1) : "0"} • {item.totalReview || 0} ulasan
                   </div>
                 </div>
 
