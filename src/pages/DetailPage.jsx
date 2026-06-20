@@ -532,11 +532,11 @@ const DetailPage = () => {
       try {
         const token = localStorage.getItem("token");
 
-        let response = await fetch(`${import.meta.env.VITE_API_URL}/api/favorit/${user.id || user?._id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+      let response = await fetch(`${import.meta.env.VITE_API_URL}/favorit/${user.id || user?._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
         if (response.status === 404) {
           response = await fetch(`${import.meta.env.VITE_API_URL}/favorit/${user.id || user?._id}`, {
@@ -577,7 +577,7 @@ const DetailPage = () => {
     try {
       const token = localStorage.getItem("token");
 
-      let response = await fetch(`${import.meta.env.VITE_API_URL}/api/favorit`, {
+      let response = await fetch(`${import.meta.env.VITE_API_URL}/favorit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
