@@ -2,6 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from "../api/axios";
 
+const cleanReviews = rawReviews.filter(rev => {
+  const username = (rev.userId?.username || rev.nama || "").toLowerCase();
+  const isiUlasan = (rev.ulasan || "").toLowerCase();
+  
+  // Saringan Super Ketat: Menghadang semua variasi kata kunci uji coba
+  return !username.includes("user") && // Menghadang semua yang mengandung kata user, usera, dislikeuser, dll.
+         !username.includes("review") && 
+         !username.includes("like") &&
+         !username.includes("test") &&
+         !isiUlasan.includes("test") &&
+         !isiUlasan.includes("update") &&
+         isiUlasan.trim() !== ""; // Menghadang komentar kosong jika ada
+});
+
 const DestinasiPage = () => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
