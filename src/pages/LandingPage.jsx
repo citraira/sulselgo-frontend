@@ -2,21 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import API from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
-const cleanReviews = rawReviews.filter(rev => {
-  const username = (rev.userId?.username || rev.nama || "").toLowerCase();
-  const isiUlasan = (rev.ulasan || "").toLowerCase();
-  
-  // Saringan Super Ketat: Menghadang semua variasi kata kunci uji coba
-  return !username.includes("user") && // Menghadang semua yang mengandung kata user, usera, dislikeuser, dll.
-         !username.includes("review") && 
-         !username.includes("like") &&
-         !username.includes("test") &&
-         !isiUlasan.includes("test") &&
-         !isiUlasan.includes("update") &&
-         isiUlasan.trim() !== ""; // Menghadang komentar kosong jika ada
-});
-
-
 const LandingPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   
@@ -42,36 +27,25 @@ const LandingPage = () => {
 
   // AUTO SLIDER
   const changeSlider = useCallback((direction) => {
-
     if (slides.length === 0) return;
 
     setCurrentIndex((prev) => {
-
       let next = prev + direction;
-
       if (next < 0) return slides.length - 1;
-
       if (next >= slides.length) return 0;
-
       return next;
-
     });
-
   }, [slides.length]);
 
   // TIMER SLIDER
   useEffect(() => {
-
     if (slides.length === 0) return;
 
     const timer = setInterval(() => {
-
       changeSlider(1);
-
     }, 5000);
 
     return () => clearInterval(timer);
-
   }, [changeSlider, slides.length]);
 
   // AMBIL DATA API + KONTROL SCROLL MANUAL TANPA ANIMASI GLOBAL CSS
@@ -125,13 +99,14 @@ const LandingPage = () => {
     sessionStorage.setItem("landing_scroll_pos", window.scrollY);
     navigate("/detail", { state: item });
   };
+  
   const handleHeroClick = () => {
-  if (!slides[currentIndex]) return;
+    if (!slides[currentIndex]) return;
 
-  navigate("/detail", {
-    state: slides[currentIndex]
-  });
-};
+    navigate("/detail", {
+      state: slides[currentIndex]
+    });
+  };
 
   return (
     <div
@@ -141,7 +116,6 @@ const LandingPage = () => {
         padding: 0
       }}
     >
-
       <style>{`
         .slider-arrow {
           cursor: pointer;
@@ -168,85 +142,62 @@ const LandingPage = () => {
           height: isMobile ? '60vh' : '85vh',
           width: '100%',
           margin: 0,
-
           backgroundImage:
             slides.length > 0
               ? `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url("${slides[currentIndex]?.gambar}")`
               : "none",
-
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'center',
-
           paddingBottom: isMobile ? '20px' : '50px',
-
           cursor: 'pointer',
-
           transition: 'background-image 0.8s ease-in-out'
         }}
       >
-
-      <div
-        onClick={handleHeroClick}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: "110px",
-          cursor: "pointer",
-          zIndex: 1
-        }}
-      />
+        <div
+          onClick={handleHeroClick}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: "110px",
+            cursor: "pointer",
+            zIndex: 1
+          }}
+        />
         {/* SLIDER INDICATOR */}
         <div
           style={{
             position: "relative",
             zIndex: 2,
-
             background: 'rgba(0,0,0,0.5)',
-
             padding: isMobile ? '10px 15px' : '12px 25px',
-
             borderRadius: '35px',
-
             backdropFilter: 'blur(10px)',
-
             border: '1px solid rgba(255,255,255,0.2)',
-
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-
             minWidth: isMobile ? '90%' : '350px',
             maxWidth: isMobile ? '90%' : '500px',
-
             boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
           }}
         >
-        <div
-          className="slider-arrow"
-          onClick={(e) => {
-            e.stopPropagation();
-            changeSlider(-1);
-          }}
-          style={{
-            color: "#fff"
-          }}
-        >
-          ❮
-        </div>
-
           <div
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              padding: '0 15px'
+            className="slider-arrow"
+            onClick={(e) => {
+              e.stopPropagation();
+              changeSlider(-1);
             }}
+            style={{ color: "#fff" }}
           >
+            ❮
+          </div>
+
+          <div style={{ flex: 1, textAlign: 'center', padding: '0 15px' }}>
             <span
               onClick={(e) => {
                 e.stopPropagation();
@@ -271,9 +222,7 @@ const LandingPage = () => {
               e.stopPropagation();
               changeSlider(1);
             }}
-            style={{
-              color: "#fff"
-            }}
+            style={{ color: "#fff" }}
           >
             ❯
           </div>
@@ -310,117 +259,101 @@ const LandingPage = () => {
           textAlign: 'center'
         }}
       >
-        <h2
-          style={{
-            fontSize: '34px',
-            marginBottom: '15px',
-            fontWeight: '700'
-          }}
-        >
+        <h2 style={{ fontSize: '34px', marginBottom: '15px', fontWeight: '700' }}>
           Destinasi Tak Terlupakan di Sulawesi Selatan
         </h2>
 
-        <p
-          style={{
-            opacity: 0.8,
-            maxWidth: '750px',
-            margin: '0 auto 60px'
-          }}
-        >
+        <p style={{ opacity: 0.8, maxWidth: '750px', margin: '0 auto 60px' }}>
           Nikmati harmoni alam, budaya, dan kuliner legendaris.
         </p>
         
-
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns:
-              'repeat(auto-fit, minmax(320px, 1fr))',
-
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: '30px'
           }}
         >
+          {Array.isArray(slides) &&
+            slides.slice(0, 4).map((item, i) => {
+              // 🚀 PERBAIKAN: Hitung ulasan bersih langsung di dalam perulangan .map() kartu
+              const rawReviews = item.reviews || item.destinasi?.reviews || [];
+              
+              const cleanReviews = rawReviews.filter(rev => {
+                const username = (rev.userId?.username || rev.nama || "").toLowerCase();
+                const isiUlasan = (rev.ulasan || "").toLowerCase();
+                
+                return !username.includes("user") && 
+                       !username.includes("review") && 
+                       !username.includes("like") &&
+                       !username.includes("test") &&
+                       !isiUlasan.includes("test") &&
+                       !isiUlasan.includes("update") &&
+                       isiUlasan.trim() !== "";
+              });
 
-      {Array.isArray(slides) &&
-        slides.slice(0, 4).map((item, i) => {
-          // 🚀 HITUNG ULANG ULASAN BERSIH DI FRONTEND
-          const rawReviews = item.reviews || item.destinasi?.reviews || [];
-          
-          const cleanReviews = rawReviews.filter(rev => {
-            const username = (rev.userId?.username || rev.nama || "").toLowerCase();
-            const isiUlasan = (rev.ulasan || "").toLowerCase();
-            
-            return !username.includes("usera") && 
-                   !username.includes("reviewuser") && 
-                   !username.includes("dislikeuser") && 
-                   !username.includes("likeuser") &&
-                   !isiUlasan.includes("test") &&
-                   !isiUlasan.includes("update kedua");
-          });
+              const totalReviewClean = cleanReviews.length;
+              
+              const avgRatingClean = totalReviewClean > 0 
+                ? (cleanReviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / totalReviewClean).toFixed(1)
+                : "0";
 
-          const totalReviewClean = cleanReviews.length;
-          
-          const avgRatingClean = totalReviewClean > 0 
-            ? (cleanReviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / totalReviewClean).toFixed(1)
-            : "0";
-
-          return (
-            <div
-              key={i}
-              onClick={() => handleCardClick(item)}
-              style={{
-                height: isMobile ? '320px' : '450px',
-                borderRadius: '25px',
-                overflow: 'hidden',
-                position: 'relative',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-                cursor: 'pointer'
-              }}
-            >
-              <img
-                src={item.gambar || item.destinasi?.gambar}
-                alt={item.nama || item.destinasi?.nama}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-              />
-
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  width: '100%',
-                  padding: '30px',
-                  background: 'linear-gradient(transparent, rgba(0,0,0,0.95))',
-                  textAlign: 'left'
-                }}
-              >
-                <h3 style={{ margin: 0, fontSize: '22px', fontWeight: '600' }}>
-                  {item.nama || item.destinasi?.nama}
-                </h3>
-
-                <p style={{ fontSize: '14px', margin: '8px 0 0', opacity: 0.85 }}>
-                  📍 {item.kabupaten || item.destinasi?.kabupaten}
-                </p>
-
-                {/* TAMPILAN RESMI: Hanya memunculkan hitungan ulasan yang bersih */}
-                <p
+              return (
+                <div
+                  key={i}
+                  onClick={() => handleCardClick(item)}
                   style={{
-                    fontSize: '14px',
-                    marginTop: '10px',
-                    color: '#ffd700',
-                    fontWeight: '600'
+                    height: isMobile ? '320px' : '450px',
+                    borderRadius: '25px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                    cursor: 'pointer'
                   }}
                 >
-                  ⭐ {avgRatingClean} • {totalReviewClean} ulasan
-                </p>
-              </div>
-            </div>
-          );
-        })}
+                  <img
+                    src={item.gambar || item.destinasi?.gambar}
+                    alt={item.nama || item.destinasi?.nama}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
 
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      width: '100%',
+                      padding: '30px',
+                      background: 'linear-gradient(transparent, rgba(0,0,0,0.95))',
+                      textAlign: 'left'
+                    }}
+                  >
+                    <h3 style={{ margin: 0, fontSize: '22px', fontWeight: '600' }}>
+                      {item.nama || item.destinasi?.nama}
+                    </h3>
+
+                    <p style={{ fontSize: '14px', margin: '8px 0 0', opacity: 0.85 }}>
+                      📍 {item.kabupaten || item.destinasi?.kabupaten}
+                    </p>
+
+                    {/* TAMPILAN RATARATA BINTANG DAN JUMLAH ULASAN YANG SUDAH BERSIH */}
+                    <p
+                      style={{
+                        fontSize: '14px',
+                        marginTop: '10px',
+                        color: '#ffd700',
+                        fontWeight: '600'
+                      }}
+                    >
+                      ⭐ {avgRatingClean} • {totalReviewClean} ulasan
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
         </div>
       </div>
     </div>
