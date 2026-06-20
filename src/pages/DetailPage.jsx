@@ -36,12 +36,23 @@ const DetailPage = () => {
   const [dislikeCounts, setDislikeCounts] = useState({}); 
   const [showAllReviews, setShowAllReviews] = useState(false);
 
+  // Helper aman untuk memformat base URL agar bebas dari /api/api ganda
+  const getCleanApiUrl = (endpoint) => {
+    const baseUrl = import.meta.env.VITE_API_URL || "";
+    // Jika endpoint dimulai dengan /api dan baseUrl diakhiri /api, bersihkan salah satu
+    if (endpoint.startsWith("/api") && baseUrl.endsWith("/api")) {
+      return `${baseUrl.replace(/\/api$/, "")}${endpoint}`;
+    }
+    // Jika baseUrl tidak memiliki /api dan endpoint juga tidak, tambahkan secara adaptif
+    return `${baseUrl}${endpoint}`;
+  };
+
   // ================= PERBAIKAN SCROLL INSTAN TANPA TRANSISI =================
   useEffect(() => {
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: "instant" // Memaksa halaman langsung berada di atas tanpa animasi
+      behavior: "instant"
     });
   }, [state]);
 
@@ -122,25 +133,41 @@ const DetailPage = () => {
     }
   };
 
-  // ================= PERBAIKAN: FETCH ULASAN ADAPTIF ANTI-404 =================
+  // ================= FETCH ULASAN ADAPTIF + FILTER DUMMY TESTING =================
   useEffect(() => {
     const fetchReviews = async () => {
       if (!state?._id) return;
 
-      setReviews([]); // Pembersihan State: Kosongkan ulasan lama saat ganti destinasi
+      setReviews([]); 
       setLoadingReview(true);
 
       try {
-        // Coba rute pertama dengan awalan /api
-        let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${state._id}`);
+        let apiUrl = getCleanApiUrl(`/api/reviews/${state._id}`);
+        let res = await fetch(apiUrl);
         
-        // Jika tidak ditemukan (404), otomatis tembak rute alternatif tanpa /api
         if (res.status === 404) {
-          res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${state._id}`);
+          // Fallback tanpa sub-path /api jika routing backend berbeda
+          const cleanBase = (import.meta.env.VITE_API_URL || "").replace(/\/api$/, "");
+          res = await fetch(`${cleanBase}/reviews/${state._id}`);
         }
 
         const data = await res.json();
-        setReviews(Array.isArray(data) ? data : data.reviews || data.data || []);
+        const rawReviews = Array.isArray(data) ? data : data.reviews || data.data || [];
+        
+        // 🚀 FILTER ANTARMUKA: Singkirkan ulasan otomatis dari Unit Testing SQA kelompokmu
+        const cleanReviews = rawReviews.filter(item => {
+          const username = (item.userId?.username || item.nama || "").toLowerCase();
+          const isiUlasan = (item.ulasan || "").toLowerCase();
+          
+          return !username.includes("usera") && 
+                 !username.includes("reviewuser") && 
+                 !username.includes("dislikeuser") && 
+                 !username.includes("likeuser") &&
+                 !isiUlasan.includes("test") &&
+                 !isiUlasan.includes("update kedua");
+        });
+
+        setReviews(cleanReviews);
       } catch (err) {
         console.error("Gagal ambil reviews:", err);
       } finally {
@@ -263,7 +290,7 @@ const DetailPage = () => {
       ? reviews
       : reviews.filter((item) => Number(item.rating) === Number(filterBintang));
 
-  // ================= PERBAIKAN: TAMBAH ULASAN ADAPTIF ANTI-MACET =================
+  // ================= PERBAIKAN: TAMBAH ULASAN ADAPTIF ANTI-404 GANDA =================
   const handleTambahUlasan = async () => {
     if (!isiUlasan.trim()) return;
 
@@ -290,8 +317,8 @@ const DetailPage = () => {
         ulasan: isiUlasan
       };
 
-      // Coba kirim request menggunakan /api
-      let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews`, {
+      let apiUrl = getCleanApiUrl("/api/reviews");
+      let res = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -300,9 +327,9 @@ const DetailPage = () => {
         body: JSON.stringify(payload)
       });
 
-      // Jika rute /api/reviews tidak ditemukan (404), lempar ke rute /reviews langsung
       if (res.status === 404) {
-        res = await fetch(`${import.meta.env.VITE_API_URL}/reviews`, {
+        const cleanBase = (import.meta.env.VITE_API_URL || "").replace(/\/api$/, "");
+        res = await fetch(`${cleanBase}/reviews`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -327,10 +354,8 @@ const DetailPage = () => {
       const data = await res.json();
       const reviewBaru = data.review || data.data || data;
 
-      // Memperbarui ulasan secara instan ke state tanpa fetch ulang
       setReviews((prevReviews) => [reviewBaru, ...prevReviews]); 
 
-      // Reset form input
       setIsiUlasan("");
       setRatingInput(0);
       setShowForm(false);
@@ -358,8 +383,9 @@ const DetailPage = () => {
 
     try {
       const token = localStorage.getItem("token");
+      let apiUrl = getCleanApiUrl(`/api/reviews/${id}`);
 
-      let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}`, {
+      let res = await fetch(apiUrl, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`
@@ -367,7 +393,8 @@ const DetailPage = () => {
       });
 
       if (res.status === 404) {
-        res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}`, {
+        const cleanBase = (import.meta.env.VITE_API_URL || "").replace(/\/api$/, "");
+        res = await fetch(`${cleanBase}/reviews/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`
@@ -396,7 +423,8 @@ const DetailPage = () => {
     
     const token = localStorage.getItem("token");
     try {
-      let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/like`, {
+      let apiUrl = getCleanApiUrl(`/api/reviews/${id}/like`);
+      let res = await fetch(apiUrl, {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${token}`,
@@ -405,7 +433,8 @@ const DetailPage = () => {
       });
 
       if (res.status === 404) {
-        res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/like`, {
+        const cleanBase = (import.meta.env.VITE_API_URL || "").replace(/\/api$/, "");
+        res = await fetch(`${cleanBase}/reviews/${id}/like`, {
           method: "POST",
           headers: { 
             "Authorization": `Bearer ${token}`,
@@ -430,7 +459,8 @@ const DetailPage = () => {
     if (!token) return;
 
     try {
-      let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/dislike`, {
+      let apiUrl = getCleanApiUrl(`/api/reviews/${id}/dislike`);
+      let res = await fetch(apiUrl, {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${token}`,
@@ -439,7 +469,8 @@ const DetailPage = () => {
       });
 
       if (res.status === 404) {
-        res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/dislike`, {
+        const cleanBase = (import.meta.env.VITE_API_URL || "").replace(/\/api$/, "");
+        res = await fetch(`${cleanBase}/reviews/${id}/dislike`, {
           method: "POST",
           headers: { 
             "Authorization": `Bearer ${token}`,
@@ -471,8 +502,9 @@ const DetailPage = () => {
 
     try {
       const token = localStorage.getItem("token");
+      let apiUrl = getCleanApiUrl(`/api/reviews/${editReviewId}`);
 
-      let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${editReviewId}`, {
+      let res = await fetch(apiUrl, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -485,7 +517,8 @@ const DetailPage = () => {
       });
 
       if (res.status === 404) {
-        res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${editReviewId}`, {
+        const cleanBase = (import.meta.env.VITE_API_URL || "").replace(/\/api$/, "");
+        res = await fetch(`${cleanBase}/reviews/${editReviewId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -524,22 +557,24 @@ const DetailPage = () => {
     }
   };
 
-  // ================= PERBAIKAN: CEK STATUS FAVORIT ADAPTIF =================
+  // ================= PERBAIKAN: CEK STATUS FAVORIT ADAPTIF ANTI-404 GANDA =================
   useEffect(() => {
     const cekStatusFavorit = async () => {
       if (!user || !state?._id) return;
 
       try {
         const token = localStorage.getItem("token");
+        let apiUrl = getCleanApiUrl(`/api/favorit/${user.id || user?._id}`);
 
-      let response = await fetch(`${import.meta.env.VITE_API_URL}/favorit/${user.id || user?._id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+        let response = await fetch(apiUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
 
         if (response.status === 404) {
-          response = await fetch(`${import.meta.env.VITE_API_URL}/favorit/${user.id || user?._id}`, {
+          const cleanBase = (import.meta.env.VITE_API_URL || "").replace(/\/api$/, "");
+          response = await fetch(`${cleanBase}/favorit/${user.id || user?._id}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -562,7 +597,7 @@ const DetailPage = () => {
     cekStatusFavorit();
   }, [state?._id, user]);
 
-  // ================= PERBAIKAN: PROCESS FAVORIT ADAPTIF =================
+  // ================= PERBAIKAN: PROCESS FAVORIT ADAPTIF ANTI-404 GANDA =================
   const handleFavorite = async () => {
     if (!user) {
       navigate("/login");
@@ -576,8 +611,9 @@ const DetailPage = () => {
 
     try {
       const token = localStorage.getItem("token");
+      let apiUrl = getCleanApiUrl("/api/favorit");
 
-      let response = await fetch(`${import.meta.env.VITE_API_URL}/favorit`, {
+      let response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -590,7 +626,8 @@ const DetailPage = () => {
       });
 
       if (response.status === 404) {
-        response = await fetch(`${import.meta.env.VITE_API_URL}/favorit`, {
+        const cleanBase = (import.meta.env.VITE_API_URL || "").replace(/\/api$/, "");
+        response = await fetch(`${cleanBase}/favorit`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -921,7 +958,9 @@ const DetailPage = () => {
 
                 <div style={{ position: "relative" }}>
                   <button
-                    onClick={() => setShowDropdown(!showDropdown)}
+                    onClick={() => {
+                      setShowDropdown(!showDropdown);
+                    }}
                     style={{
                       padding: "9px 14px",
                       borderRadius: "10px",
@@ -1583,7 +1622,6 @@ const DetailPage = () => {
             </div>
           )}
 
-          {/* Gambar */}
           <img
             src={selectedImage}
             alt="preview"
@@ -1600,7 +1638,6 @@ const DetailPage = () => {
             }}
           />
 
-          {/* Tombol Zoom */}
           <div
             onClick={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
@@ -1665,7 +1702,6 @@ const DetailPage = () => {
             </button>
           </div>
 
-          {/* Tombol Tutup */}
           <button
             onClick={(e) => {
               e.stopPropagation();
