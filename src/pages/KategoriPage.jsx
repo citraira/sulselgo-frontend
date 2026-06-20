@@ -7,20 +7,17 @@ const KategoriPage = () => {
   const navigate = useNavigate();
   const [destinasiList, setDestinasiList] = useState([]);
   const location = useLocation();
+  const isMobile = window.innerWidth <= 768; // Menambahkan variabel deteksi layar responsif
 
   const [selectedKategori, setSelectedKategori] = useState(
-  location.state?.selectedKategori || null
-);
+    location.state?.selectedKategori || null
+  );
 
   useEffect(() => {
-
     API.get("/destinasi")
       .then((res) => {
-
         const data = res.data;
-
         setDestinasiList(data);
-
       })
       .catch((err) =>
         console.error(
@@ -28,7 +25,6 @@ const KategoriPage = () => {
           err
         )
       );
-
   }, []);
 
   const kategoriData = [ 
@@ -41,7 +37,7 @@ const KategoriPage = () => {
   // Data yang sudah difilter berdasarkan kategori yang diklik
   const filteredDestinasi = destinasiList.filter(item => item.kategori === selectedKategori);
 
-  // Jika kategori dipilih, tampilkan halaman daftar destinasi (seperti di gambar)
+  // Jika kategori dipilih, tampilkan halaman daftar destinasi
   if (selectedKategori) {
     return (
       <div style={{ backgroundColor: '#fff', minHeight: '100vh', paddingTop: '100px', paddingLeft: '6%', paddingRight: '6%' }}>
@@ -101,7 +97,7 @@ const KategoriPage = () => {
           </h1>
         </div>
 
-        {/* GRID DAFTAR DESTINASI SESUAI GAMBAR */}
+        {/* GRID DAFTAR DESTINASI */}
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
@@ -145,73 +141,74 @@ const KategoriPage = () => {
     );
   }
 
- // Tampilan Awal (Grid 4 Kategori)
-return (
-  <div style={{ backgroundColor: '#fff', minHeight: '100vh', paddingTop: '70px' }}>
+  // Tampilan Awal (Grid 4 Kategori)
+  return (
+    <div style={{ backgroundColor: '#fff', minHeight: '100vh', paddingTop: '70px' }}>
 
-    <div style={{
-      height: '350px',
-      width: '100%',
-      backgroundImage: "url('https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781027521/sulselgo/dpdmbu1yrbmiqyxmcpho.png')",
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      position: 'relative'
-    }}>
-
-      <button
-        onClick={() => navigate('/')}
-        style={{
-          position: 'absolute',
-          top: '20px',
-          left: '20px',
-          width: '42px',
-          height: '42px',
-          borderRadius: '50%',
-          border: 'none',
-          background: 'rgba(255,255,255,0.95)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          zIndex: 20,
-          transition: '0.2s ease'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.05)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-        }}
-      >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#111"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-      </button>
-
-    </div>
-
-    {/* TITLE */}
-    <div style={{ textAlign: 'center', padding: '40px 10% 20px' }}>
-      <h1 style={{
-        fontSize: '24px',
-        fontWeight: '700',
-        color: '#1a1a1a'
+      {/* PERBAIKAN: Tinggi disamakan secara responsif dengan DestinasiPage */}
+      <div style={{
+        height: isMobile ? '280px' : '380px',
+        width: '100%',
+        backgroundImage: "url('https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781027521/sulselgo/dpdmbu1yrbmiqyxmcpho.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        position: 'relative'
       }}>
-        Kategori Perjalanan
-      </h1>
-    </div>
-      
+
+        <button
+          onClick={() => navigate('/')}
+          style={{
+            position: 'absolute',
+            top: '20px',
+            left: '20px',
+            width: '42px',
+            height: '42px',
+            borderRadius: '50%',
+            border: 'none',
+            background: 'rgba(255,255,255,0.95)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            zIndex: 20,
+            transition: '0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#111"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </button>
+
+      </div>
+
+      {/* TITLE */}
+      <div style={{ textAlign: 'center', padding: '40px 10% 20px' }}>
+        <h1 style={{
+          fontSize: '24px',
+          fontWeight: '700',
+          color: '#1a1a1a'
+        }}>
+          Kategori Perjalanan
+        </h1>
+      </div>
+        
       <div style={{ margin: '0 auto 50px', width: '90%', maxWidth: '1000px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
         {kategoriData.map((k, idx) => (
           <div key={idx} onClick={() => setSelectedKategori(k.n)} style={{
