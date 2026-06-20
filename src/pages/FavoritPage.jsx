@@ -62,28 +62,33 @@ const FavoritPage = () => {
     navigate('/detail', { state: item });
   };
 
+  // PERBAIKAN: Lebar diubah ke 100% agar mengikuti ukuran kolom grid secara dinamis
   const cardStyle = {
-    width: '300px',
-    height: '350px',
-    borderRadius: '25px',
+    width: '100%',
+    height: '360px', // Sedikit dinaikkan agar proporsi tinggi kartu proporsional
+    borderRadius: '24px',
     overflow: 'hidden',
     position: 'relative',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
     cursor: 'pointer',
     border: '5px solid #fff',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    boxSizing: 'border-box',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease'
   };
 
   return (
     <div style={{ 
       backgroundColor: '#fff', 
       minHeight: '100vh', 
-      paddingTop: '100px', 
+      paddingTop: '120px', // Sedikit ditambah ruang atas agar tidak menumpuk dengan tombol back
       paddingLeft: '6%', 
-      paddingRight: '6%' 
+      paddingRight: '6%',
+      paddingBottom: '40px', // Padding bawah agar baris terakhir tidak mentok batas layar
+      boxSizing: 'border-box'
     }}>
       
-      {/* BACK BUTTON BARU */}
+      {/* BACK BUTTON */}
       <button
         onClick={() => navigate(-1)}
         style={{
@@ -141,24 +146,37 @@ const FavoritPage = () => {
         </h1>
       </div>
 
-      {/* GRID DAFTAR FAVORIT */}
+      {/* GRID DAFTAR FAVORIT - PERBAIKAN TOTAL MENGGUNAKAN CSS GRID */}
       <div
         style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "10px",
-          justifyContent: "flex-start"
+          display: "grid",
+          gridTemplateColumns: window.innerWidth <= 768 ? "1fr 1fr" : "repeat(auto-fill, minmax(280px, 1fr))",
+          gap: "24px", // Jarak konstan antar kartu horizontal & vertikal
+          justifyContent: "start",
+          width: "100%"
         }}
       >
         {favoritDestinasi.length > 0 ? (
-          favoritDestinasi.map((item) => (
+          favoritDestinasi.map((item, index) => (
             <div 
-              key={item?._id}
+              key={item?._id || index}
               style={cardStyle}
-              onClick={() => handleCardClick(item)} // Menggunakan fungsi rekam scroll
+              onClick={() => handleCardClick(item)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.12)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
+              }}
             >
               {/* GAMBAR */}
-              <img src={item?.gambar} alt={item?.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img 
+                src={item?.gambar} 
+                alt={item?.nama} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              />
               
               {/* ICON LOVE (DIPILIH) */}
               <div style={{
@@ -185,23 +203,23 @@ const FavoritPage = () => {
                 bottom: 0, 
                 left: 0, 
                 right: 0,
-                background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)',
+                background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)',
                 color: '#fff', 
                 textAlign: 'left',
                 padding: '20px',
                 pointerEvents: 'none'
               }}>
-                <div style={{ fontWeight: '800', fontSize: '20px', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                <div style={{ fontWeight: '800', fontSize: '20px', textShadow: '0 2px 4px rgba(0,0,0,0.6)', marginBottom: '4px' }}>
                   {item?.nama}
                 </div>
-                <div style={{ fontSize: '14px', opacity: 0.9 }}>
+                <div style={{ fontSize: '14px', opacity: 0.95, fontWeight: '500' }}>
                   {item?.kabupaten}
                 </div>
               </div>
             </div>
           ))
         ) : (
-          <p style={{ color: '#666' }}>Belum ada destinasi favorit yang ditambahkan.</p>
+          <p style={{ color: '#666', gridColumn: '1 / -1' }}>Belum ada destinasi favorit yang ditambahkan.</p>
         )}
       </div>
 
