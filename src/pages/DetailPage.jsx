@@ -131,7 +131,7 @@ const DetailPage = () => {
 
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/reviews/${state._id}`
+          `${import.meta.env.VITE_API_URL}/api/reviews/${state._id}`
         );
         const data = await res.json();
         setReviews(Array.isArray(data) ? data : data.reviews || data.data || []);
@@ -269,44 +269,61 @@ const DetailPage = () => {
 
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Sesi Anda habis. Silakan login kembali.");
+        navigate("/login");
+        return;
+      }
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews`, {
+      const payload = {
+        destinasiId: state?._id,
+        userId: user?.id || user?._id,
+        nama: user?.username || "User",
+        rating: ratingInput || 5,
+        ulasan: isiUlasan
+      };
+
+      // Ditambahkan path /api sesuai rute pendaftaran rute backend
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-          destinasiId: state._id,
-          userId: user?.id || user?._id,
-          nama: user?.username || "User",
-          rating: ratingInput || 5,
-          ulasan: isiUlasan
-        })
+        body: JSON.stringify(payload)
       });
+
+      // Mencegah macet jika respons mengembalikan HTML error (seperti 404 dari Vercel/Render)
+      if (!res.ok) {
+        let errorMessage = "Gagal menambahkan ulasan.";
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          errorMessage = `Server bermasalah dengan status kode: ${res.status}`;
+        }
+        alert(errorMessage);
+        return;
+      }
 
       const data = await res.json();
 
-      if (res.ok) {
-        // Proteksi: Ekstrak objek ulasan jika backend membungkusnya di dalam properti review/data
-        const reviewBaru = data.review || data.data || data;
+      // Ekstrak data ulasan murni (mengatasi pembungkusan data dari server)
+      const reviewBaru = data.review || data.data || data;
 
-        // Memperbarui state secara instan
-        setReviews((prevReviews) => [reviewBaru, ...prevReviews]); 
+      // Memperbarui state secara instan
+      setReviews((prevReviews) => [reviewBaru, ...prevReviews]); 
 
-        // Reset form input
-        setIsiUlasan("");
-        setRatingInput(0);
-        setShowForm(false);
-        alert("Ulasan berhasil dikirim!");
-      } else {
-        alert(data.message || "Gagal menambahkan ulasan. Periksa otoritas login Anda.");
-      }
+      // Reset form input
+      setIsiUlasan("");
+      setRatingInput(0);
+      setShowForm(false);
+      alert("Ulasan berhasil dikirim!");
     } catch (err) {
       console.error("Gagal tambah ulasan:", err);
       alert("Gagal terhubung ke server. Pastikan koneksi atau alamat API Anda benar.");
     } finally {
-      // Menjamin status loading mati meskipun terjadi crash/error data
+      // Menjamin status loading mati meskipun terjadi kendala parsing data
       setLoadingReview(false);
     }
   };
@@ -326,7 +343,7 @@ const DetailPage = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`
@@ -353,7 +370,7 @@ const DetailPage = () => {
     
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/like`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/like`, {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${token}`,
@@ -376,7 +393,7 @@ const DetailPage = () => {
     if (!token) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/dislike`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/dislike`, {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${token}`,
@@ -408,7 +425,7 @@ const DetailPage = () => {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/reviews/${editReviewId}`,
+        `${import.meta.env.VITE_API_URL}/api/reviews/${editReviewId}`,
         {
           method: "PUT",
           headers: {
@@ -456,7 +473,7 @@ const DetailPage = () => {
         const token = localStorage.getItem("token");
 
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/favorit/${user.id || user?._id}`,
+          `${import.meta.env.VITE_API_URL}/api/favorit/${user.id || user?._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -494,7 +511,7 @@ const DetailPage = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/favorit`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favorit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
