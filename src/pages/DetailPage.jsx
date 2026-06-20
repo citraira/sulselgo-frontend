@@ -248,11 +248,6 @@ const handleTouchEnd = () => {
       return;
     }
 
-    if (!state?._id) {
-      alert("Data destinasi tidak memiliki ID MongoDB.");
-      return;
-    }
-
     setLoadingReview(true);
 
     try {
@@ -273,18 +268,17 @@ const handleTouchEnd = () => {
         })
       });
 
-      const data = await res.json();
+      const data = await res.json(); // Data ulasan baru dari backend
 
       if (res.ok) {
-        const updated = await fetch(
-          `${import.meta.env.VITE_API_URL}/reviews/${state._id}`
-        );
-        const newData = await updated.json();
-        setReviews(newData);
+        // PERBAIKAN: Masukkan data baru ke dalam state reviews tanpa perlu fetch ulang
+        setReviews((prevReviews) => [data, ...prevReviews]); 
 
+        // Reset form
         setIsiUlasan("");
         setRatingInput(0);
         setShowForm(false);
+        alert("Ulasan berhasil dikirim!");
       } else {
         alert(data.message || "Gagal menambahkan ulasan");
       }
@@ -295,7 +289,6 @@ const handleTouchEnd = () => {
       setLoadingReview(false);
     }
   };
-
   const handleSelectFilter = (star) => {
     setFilterBintang(star);
     setShowDropdown(false);
