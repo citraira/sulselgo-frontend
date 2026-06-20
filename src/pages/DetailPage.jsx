@@ -153,21 +153,23 @@ const DetailPage = () => {
 
         const data = await res.json();
         const rawReviews = Array.isArray(data) ? data : data.reviews || data.data || [];
-        
-        // 🚀 FILTER ANTARMUKA: Singkirkan ulasan otomatis dari Unit Testing SQA kelompokmu
+
+        // Filter ulasan testing
         const cleanReviews = rawReviews.filter(item => {
           const username = (item.userId?.username || item.nama || "").toLowerCase();
           const isiUlasan = (item.ulasan || "").toLowerCase();
           
           return !username.includes("usera") && 
-                 !username.includes("reviewuser") && 
-                 !username.includes("dislikeuser") && 
-                 !username.includes("likeuser") &&
-                 !isiUlasan.includes("test") &&
-                 !isiUlasan.includes("update kedua");
+                !username.includes("reviewuser") && 
+                !username.includes("dislikeuser") && 
+                !username.includes("likeuser") &&
+                !isiUlasan.includes("test") &&
+                !isiUlasan.includes("update kedua");
         });
 
+     
         setReviews(cleanReviews);
+
       } catch (err) {
         console.error("Gagal ambil reviews:", err);
       } finally {
