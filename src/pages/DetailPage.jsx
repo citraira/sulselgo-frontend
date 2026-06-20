@@ -122,17 +122,23 @@ const DetailPage = () => {
     }
   };
 
+  // ================= PERBAIKAN: FETCH ULASAN ADAPTIF ANTI-404 =================
   useEffect(() => {
     const fetchReviews = async () => {
       if (!state?._id) return;
 
-      setReviews([]); // Pembersihan State: Mengosongkan ulasan lama sebelum mengambil yang baru
+      setReviews([]); // Pembersihan State: Kosongkan ulasan lama saat ganti destinasi
       setLoadingReview(true);
 
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/reviews/${state._id}`
-        );
+        // Coba rute pertama dengan awalan /api
+        let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${state._id}`);
+        
+        // Jika tidak ditemukan (404), otomatis tembak rute alternatif tanpa /api
+        if (res.status === 404) {
+          res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${state._id}`);
+        }
+
         const data = await res.json();
         setReviews(Array.isArray(data) ? data : data.reviews || data.data || []);
       } catch (err) {
@@ -144,6 +150,7 @@ const DetailPage = () => {
 
     fetchReviews();
   }, [state?._id]);
+  // ==========================================================================
 
   if (!state) {
     return (
@@ -256,7 +263,7 @@ const DetailPage = () => {
       ? reviews
       : reviews.filter((item) => Number(item.rating) === Number(filterBintang));
 
-  // ================= PERBAIKAN TIMEOUT & PROTEKSI FUNGSI TAMBAH ULASAN =================
+  // ================= PERBAIKAN: TAMBAH ULASAN ADAPTIF ANTI-MACET =================
   const handleTambahUlasan = async () => {
     if (!isiUlasan.trim()) return;
 
@@ -283,8 +290,8 @@ const DetailPage = () => {
         ulasan: isiUlasan
       };
 
-      // Ditambahkan path /api sesuai rute pendaftaran rute backend
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews`, {
+      // Coba kirim request menggunakan /api
+      let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -293,7 +300,18 @@ const DetailPage = () => {
         body: JSON.stringify(payload)
       });
 
-      // Mencegah macet jika respons mengembalikan HTML error (seperti 404 dari Vercel/Render)
+      // Jika rute /api/reviews tidak ditemukan (404), lempar ke rute /reviews langsung
+      if (res.status === 404) {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/reviews`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+      }
+
       if (!res.ok) {
         let errorMessage = "Gagal menambahkan ulasan.";
         try {
@@ -307,11 +325,9 @@ const DetailPage = () => {
       }
 
       const data = await res.json();
-
-      // Ekstrak data ulasan murni (mengatasi pembungkusan data dari server)
       const reviewBaru = data.review || data.data || data;
 
-      // Memperbarui state secara instan
+      // Memperbarui ulasan secara instan ke state tanpa fetch ulang
       setReviews((prevReviews) => [reviewBaru, ...prevReviews]); 
 
       // Reset form input
@@ -323,7 +339,6 @@ const DetailPage = () => {
       console.error("Gagal tambah ulasan:", err);
       alert("Gagal terhubung ke server. Pastikan koneksi atau alamat API Anda benar.");
     } finally {
-      // Menjamin status loading mati meskipun terjadi kendala parsing data
       setLoadingReview(false);
     }
   };
@@ -336,6 +351,7 @@ const DetailPage = () => {
 
   const labelFilter = filterBintang === "all" ? "Semua Bintang" : `${filterBintang} Bintang`;
 
+  // ================= PERBAIKAN: HAPUS ULASAN ADAPTIF =================
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Yakin ingin menghapus ulasan?");
     if (!confirmDelete) return;
@@ -343,12 +359,21 @@ const DetailPage = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}`, {
+      let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
+
+      if (res.status === 404) {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+      }
 
       const data = await res.json();
 
@@ -365,18 +390,29 @@ const DetailPage = () => {
     }
   };
 
+  // ================= PERBAIKAN: LIKE ULASAN ADAPTIF =================
   const handleLike = async (id) => {
     if (!user) { navigate("/login"); return; }
     
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/like`, {
+      let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/like`, {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json" 
         }
       });
+
+      if (res.status === 404) {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/like`, {
+          method: "POST",
+          headers: { 
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json" 
+          }
+        });
+      }
       
       if (res.ok) {
         const updatedReview = await res.json();
@@ -387,19 +423,30 @@ const DetailPage = () => {
     }
   };
 
+  // ================= PERBAIKAN: DISLIKE ULASAN ADAPTIF =================
   const handleDislike = async (id) => {
     if (!user) { navigate("/login"); return; }
     const token = localStorage.getItem("token");
     if (!token) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/dislike`, {
+      let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/dislike`, {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json"
         }
       });
+
+      if (res.status === 404) {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/dislike`, {
+          method: "POST",
+          headers: { 
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+      }
       
       if (res.ok) {
         const updatedReview = await res.json();
@@ -418,15 +465,27 @@ const DetailPage = () => {
     setMenuAktif(null);
   };
 
+  // ================= PERBAIKAN: SIMPAN EDIT ULASAN ADAPTIF =================
   const handleSimpanEdit = async () => {
     if (!editIsiUlasan.trim()) return;
 
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/reviews/${editReviewId}`,
-        {
+      let res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${editReviewId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          rating: editRatingInput,
+          ulasan: editIsiUlasan
+        })
+      });
+
+      if (res.status === 404) {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${editReviewId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -436,8 +495,8 @@ const DetailPage = () => {
             rating: editRatingInput,
             ulasan: editIsiUlasan
           })
-        }
-      );
+        });
+      }
 
       const data = await res.json();
 
@@ -465,6 +524,7 @@ const DetailPage = () => {
     }
   };
 
+  // ================= PERBAIKAN: CEK STATUS FAVORIT ADAPTIF =================
   useEffect(() => {
     const cekStatusFavorit = async () => {
       if (!user || !state?._id) return;
@@ -472,14 +532,19 @@ const DetailPage = () => {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/favorit/${user.id || user?._id}`,
-          {
+        let response = await fetch(`${import.meta.env.VITE_API_URL}/api/favorit/${user.id || user?._id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 404) {
+          response = await fetch(`${import.meta.env.VITE_API_URL}/favorit/${user.id || user?._id}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
-          }
-        );
+          });
+        }
 
         const data = await response.json();
         const listFavorit = Array.isArray(data) ? data : data.favorit || data.data || [];
@@ -497,6 +562,7 @@ const DetailPage = () => {
     cekStatusFavorit();
   }, [state?._id, user]);
 
+  // ================= PERBAIKAN: PROCESS FAVORIT ADAPTIF =================
   const handleFavorite = async () => {
     if (!user) {
       navigate("/login");
@@ -511,7 +577,7 @@ const DetailPage = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/favorit`, {
+      let response = await fetch(`${import.meta.env.VITE_API_URL}/api/favorit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -522,6 +588,20 @@ const DetailPage = () => {
           destinasiId: state._id
         })
       });
+
+      if (response.status === 404) {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/favorit`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            userId: user.id || user?._id,
+            destinasiId: state._id
+          })
+        });
+      }
 
       const data = await response.json();
 
