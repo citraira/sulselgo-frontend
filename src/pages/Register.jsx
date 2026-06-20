@@ -15,19 +15,27 @@ export default function Register() {
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   // Logika Backend: Fungsi untuk mengirim data ke MongoDB
   const handleRegister = async (e) => {
 
-    e.preventDefault();
+  e.preventDefault();
 
-    if (
-      formData.telepon.length < 10 ||
-      formData.telepon.length > 13
-    ) {
-      alert("Nomor telepon harus 10-13 digit!");
-      return;
-    }
+  setPasswordError("");
+
+  if (
+    formData.telepon.length < 10 ||
+    formData.telepon.length > 13
+  ) {
+    alert("Nomor telepon harus 10-13 digit!");
+    return;
+  }
+
+  if (formData.password.length < 6) {
+    setPasswordError("Password minimal 6 karakter");
+    return;
+  }
 
     setLoading(true);
 
@@ -279,12 +287,16 @@ export default function Register() {
               placeholder="Masukkan Kata sandi"
               required
               value={formData.password}
-              onChange={(e) =>
+              onChange={(e) => {
                 setFormData({
                   ...formData,
                   password: e.target.value
-                })
-              }
+                });
+
+                if (e.target.value.length >= 6) {
+                  setPasswordError("");
+                }
+              }}
               style={{
                 paddingRight: "45px"
               }}
@@ -350,9 +362,23 @@ export default function Register() {
 
             </button>
 
-          </div>
+            </div>
 
-          <button type="submit" disabled={loading}>
+            {passwordError && (
+              <div
+                style={{
+                  color: "#dc2626",
+                  fontSize: "12px",
+                  marginTop: "-8px",
+                  marginBottom: "10px",
+                  textAlign: "left"
+                }}
+              >
+                {passwordError}
+              </div>
+            )}
+
+            <button type="submit" disabled={loading}>
             {loading ? "Memproses..." : "Daftar"}
           </button>
 

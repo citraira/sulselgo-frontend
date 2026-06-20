@@ -158,7 +158,7 @@ useEffect(() => {
         }}
       >
         <img
-          src="/leang leang.jpg"
+          src="https://res.cloudinary.com/dnxo5qbrg/image/upload/v1781029397/sulselgo/k5ptrmeg8u3mzniztyws.png"
           alt="Header Profil"
           style={{
             width: "100%",
@@ -655,7 +655,7 @@ useEffect(() => {
                       style={{
                         flex: 1,
                         minWidth: isMobile ? "100%" : "180px",
-                        padding: "15px 18px",
+                        padding: isMobile ? "13px 16px" : "15px 18px",
                         borderRadius: "16px",
                         border: "none",
                         background: "linear-gradient(135deg, #8b0000, #b41515)",
