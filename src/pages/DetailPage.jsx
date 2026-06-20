@@ -847,7 +847,8 @@ const DetailPage = () => {
               marginBottom: "18px",
               fontSize: "14px",
               lineHeight: "1.8",
-              color: "#333"
+              color: "#333",
+              textAlign: "justify" // 🚀 PERBAIKAN: Membuat teks deskripsi rata kanan-kiri
             }}
           >
             {deskripsiTampil}
