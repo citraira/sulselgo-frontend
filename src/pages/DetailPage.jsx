@@ -887,9 +887,10 @@ const DetailPage = () => {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns:
-                    window.innerWidth <= 768 ? "1fr 1fr" : "repeat(auto-fill, minmax(220px, 1fr))",
-                  gap: "10px",
+                  // PERBAIKAN: Menggunakan auto-fill dengan batas minimal 280px agar gambar melebar proporsional memenuhi layar
+                  gridTemplateColumns: window.innerWidth <= 768 ? "1fr 1fr" : "repeat(auto-fill, minmax(280px, 1fr))",
+                  gap: "16px", // Jarak antar foto sedikit diperlebar agar lebih estetik
+                  width: "100%"
                 }}
               >
                 {galeri.map((foto, index) => (
@@ -903,12 +904,19 @@ const DetailPage = () => {
                       setZoom(1);
                     }}
                     style={{
-                      width: "220px",
-                      height: window.innerWidth <= 768 ? "120px" : "150px",
+                      width: "100%", // PERBAIKAN: Mengisi 100% lebar kolom agar tidak menyisakan ruang kosong di kanan
+                      height: window.innerWidth <= 768 ? "130px" : "180px", // Tinggi sedikit dinaikkan agar rasio pemandangan laut lebih terlihat
                       objectFit: "cover",
-                      borderRadius: "12px",
+                      borderRadius: "14px",
                       cursor: "pointer",
-                      transition: "0.2s"
+                      boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+                      transition: "transform 0.2s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "scale(1.02)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "scale(1)";
                     }}
                   />
                 ))}
