@@ -449,6 +449,9 @@ const handleSimpanEdit = async () => {
     const fetchReviews = async () => {
       if (!state?._id) return;
 
+      setReviews([]); 
+      setLoadingReview(true);
+
       try {
         const res = await fetch(
           `${import.meta.env.VITE_API_URL}/reviews/${state._id}`
