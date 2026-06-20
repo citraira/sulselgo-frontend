@@ -1162,9 +1162,9 @@ const handleSimpanEdit = async () => {
                               </span>
                             </div>
 
-                            <div style={{ fontSize: "15px", color: "#111", marginBottom: "10px", lineHeight: "1.6" }}>{item.ulasan}</div>
                             <div style={{ marginBottom: "10px" }}>{renderStarsDisplay(item.rating)}</div>
-
+                            <div style={{ fontSize: "15px", color: "#111", marginBottom: "10px", lineHeight: "1.6" }}>{item.ulasan}</div>
+                           
                             {/* --- BAGIAN LIKE & DISLIKE YANG DIPERBAIKI --- */}
                             <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
                               
