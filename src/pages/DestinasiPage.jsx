@@ -264,6 +264,27 @@ const DestinasiPage = () => {
           {topDestinasi.map((item, idx) => {
             const data = item.destinasi || item;
 
+            // 🚀 HITUNG ULANG ULASAN BERSIH DI FRONTEND
+            const rawReviews = item.reviews || data.reviews || [];
+            
+            const cleanReviews = rawReviews.filter(rev => {
+              const username = (rev.userId?.username || rev.nama || "").toLowerCase();
+              const isiUlasan = (rev.ulasan || "").toLowerCase();
+              
+              return !username.includes("usera") && 
+                     !username.includes("reviewuser") && 
+                     !username.includes("dislikeuser") && 
+                     !username.includes("likeuser") &&
+                     !isiUlasan.includes("test") &&
+                     !isiUlasan.includes("update kedua");
+            });
+
+            const totalReviewClean = cleanReviews.length;
+            
+            const avgRatingClean = totalReviewClean > 0 
+              ? (cleanReviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / totalReviewClean).toFixed(1)
+              : "0";
+
             return (
               <div
                 key={idx}
@@ -314,7 +335,7 @@ const DestinasiPage = () => {
 
                 <img src={data.gambar || gambarDefault} alt={data.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 
-                {/* OVERLAY TEKS DENGAN JUMLAH ULASAN */}
+                {/* OVERLAY TEKS DENGAN JUMLAH ULASAN BERSIH */}
                 <div style={{
                   position: 'absolute',
                   bottom: 0,
@@ -330,14 +351,15 @@ const DestinasiPage = () => {
                   <div style={{ opacity: 0.85, fontSize: '14px', marginTop: '2px' }}>
                     📍 {data.kabupaten}
                   </div>
-                  {/* PERBAIKAN: Menampilkan Rating Bintang beserta Total Ulasan seperti LandingPage */}
+                  
+                  {/* TAMPILAN RESMI: Sinkron dengan ulasan asli saja */}
                   <div style={{
                     fontSize: '14px',
                     marginTop: '6px',
                     color: '#ffd700',
                     fontWeight: '600'
                   }}>
-                    ⭐ {item.avgRating ? item.avgRating.toFixed(1) : "0"} • {item.totalReview || 0} ulasan
+                    ⭐ {avgRatingClean} • {totalReviewClean} ulasan
                   </div>
                 </div>
 

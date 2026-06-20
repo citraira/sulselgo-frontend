@@ -327,88 +327,84 @@ const LandingPage = () => {
         >
 
       {Array.isArray(slides) &&
-        slides.slice(0, 4).map((item, i) => (
-          <div
-            key={i}
-            onClick={() => handleCardClick(item)}
-            style={{
-              height: isMobile ? '320px' : '450px',
+        slides.slice(0, 4).map((item, i) => {
+          // 🚀 HITUNG ULANG ULASAN BERSIH DI FRONTEND
+          const rawReviews = item.reviews || item.destinasi?.reviews || [];
+          
+          const cleanReviews = rawReviews.filter(rev => {
+            const username = (rev.userId?.username || rev.nama || "").toLowerCase();
+            const isiUlasan = (rev.ulasan || "").toLowerCase();
+            
+            return !username.includes("usera") && 
+                   !username.includes("reviewuser") && 
+                   !username.includes("dislikeuser") && 
+                   !username.includes("likeuser") &&
+                   !isiUlasan.includes("test") &&
+                   !isiUlasan.includes("update kedua");
+          });
 
-              borderRadius: '25px',
+          const totalReviewClean = cleanReviews.length;
+          
+          const avgRatingClean = totalReviewClean > 0 
+            ? (cleanReviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / totalReviewClean).toFixed(1)
+            : "0";
 
-              overflow: 'hidden',
-
-              position: 'relative',
-
-              boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-
-              cursor: 'pointer'
-            }}
-          >
-
-            <img
-              src={item.gambar}
-              alt={item.nama}
-
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover'
-              }}
-            />
-
+          return (
             <div
+              key={i}
+              onClick={() => handleCardClick(item)}
               style={{
-                position: 'absolute',
-                bottom: 0,
-
-                width: '100%',
-
-                padding: '30px',
-
-                background:
-                  'linear-gradient(transparent, rgba(0,0,0,0.95))',
-
-                textAlign: 'left'
+                height: isMobile ? '320px' : '450px',
+                borderRadius: '25px',
+                overflow: 'hidden',
+                position: 'relative',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                cursor: 'pointer'
               }}
             >
-
-              <h3
+              <img
+                src={item.gambar || item.destinasi?.gambar}
+                alt={item.nama || item.destinasi?.nama}
                 style={{
-                  margin: 0,
-                  fontSize: '22px',
-                  fontWeight: '600'
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
+
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  width: '100%',
+                  padding: '30px',
+                  background: 'linear-gradient(transparent, rgba(0,0,0,0.95))',
+                  textAlign: 'left'
                 }}
               >
-                {item.nama}
-              </h3>
+                <h3 style={{ margin: 0, fontSize: '22px', fontWeight: '600' }}>
+                  {item.nama || item.destinasi?.nama}
+                </h3>
 
-              <p
-                style={{
-                  fontSize: '14px',
-                  margin: '8px 0 0',
-                  opacity: 0.85
-                }}
-              >
-                📍 {item.kabupaten}
-              </p>
+                <p style={{ fontSize: '14px', margin: '8px 0 0', opacity: 0.85 }}>
+                  📍 {item.kabupaten || item.destinasi?.kabupaten}
+                </p>
 
-              <p
-                style={{
-                  fontSize: '14px',
-                  marginTop: '10px',
-                  color: '#ffd700',
-                  fontWeight: '600'
-                }}
-              >
-                ⭐ {item.avgRating?.toFixed(1) || "0"} •{" "}
-                {item.totalReview || 0} ulasan
-              </p>
-
+                {/* TAMPILAN RESMI: Hanya memunculkan hitungan ulasan yang bersih */}
+                <p
+                  style={{
+                    fontSize: '14px',
+                    marginTop: '10px',
+                    color: '#ffd700',
+                    fontWeight: '600'
+                  }}
+                >
+                  ⭐ {avgRatingClean} • {totalReviewClean} ulasan
+                </p>
+              </div>
             </div>
-          </div>
-
-        ))}
+          );
+        })}
 
         </div>
       </div>
