@@ -1,7 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-
 const DetailPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -47,88 +46,104 @@ const DetailPage = () => {
   }, [state]);
 
   useEffect(() => {
-  const handleResize = () => {
-    setIsMobile(window.innerWidth <= 768);
-  };
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
 
-  window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize);
 
-  return () => {
-    window.removeEventListener("resize", handleResize);
-  };
-}, []);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   // ==========================================================================
 
   const nextImage = () => {
-  const next =
-    (currentImageIndex + 1) % galeri.length;
+    const next = (currentImageIndex + 1) % galeri.length;
+    setCurrentImageIndex(next);
+    setSelectedImage(galeri[next]);
+    setZoom(1);
+  };
 
-  setCurrentImageIndex(next);
-  setSelectedImage(galeri[next]);
-  setZoom(1);
-};
+  const prevImage = () => {
+    const prev = (currentImageIndex - 1 + galeri.length) % galeri.length;
+    setCurrentImageIndex(prev);
+    setSelectedImage(galeri[prev]);
+    setZoom(1);
+  };
 
-const prevImage = () => {
-  const prev =
-    (currentImageIndex - 1 + galeri.length) %
-    galeri.length;
+  const zoomIn = () => {
+    setZoom((prev) => Math.min(prev + 0.2, 2.5));
+  };
 
-  setCurrentImageIndex(prev);
-  setSelectedImage(galeri[prev]);
-  setZoom(1);
-};
+  const zoomOut = () => {
+    setZoom((prev) => Math.max(prev - 0.2, 1));
+  };
 
-const zoomIn = () => {
-  setZoom((prev) => Math.min(prev + 0.2, 2.5));
-};
+  useEffect(() => {
+    if (!selectedImage || isMobile) return;
 
-const zoomOut = () => {
-  setZoom((prev) => Math.max(prev - 0.2, 1));
-};
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowRight") {
+        nextImage();
+      }
+      if (e.key === "ArrowLeft") {
+        prevImage();
+      }
+      if (e.key === "Escape") {
+        setSelectedImage(null);
+      }
+    };
 
-useEffect(() => {
-  if (!selectedImage || isMobile) return;
+    window.addEventListener("keydown", handleKeyDown);
 
-  const handleKeyDown = (e) => {
-    if (e.key === "ArrowRight") {
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedImage, isMobile, currentImageIndex]);
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const diff = touchStartX.current - touchEndX.current;
+
+    if (Math.abs(diff) < 50) return;
+
+    if (diff > 0) {
       nextImage();
-    }
-
-    if (e.key === "ArrowLeft") {
+    } else {
       prevImage();
     }
-
-    if (e.key === "Escape") {
-      setSelectedImage(null);
-    }
   };
 
-  window.addEventListener("keydown", handleKeyDown);
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!state?._id) return;
 
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-  };
-}, [selectedImage, isMobile, currentImageIndex]);
+      setReviews([]); // Pembersihan State: Mengosongkan ulasan lama sebelum mengambil yang baru
+      setLoadingReview(true);
 
-const handleTouchStart = (e) => {
-  touchStartX.current = e.touches[0].clientX;
-};
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/reviews/${state._id}`
+        );
+        const data = await res.json();
+        setReviews(Array.isArray(data) ? data : data.reviews || data.data || []);
+      } catch (err) {
+        console.error("Gagal ambil reviews:", err);
+      } finally {
+        setLoadingReview(false);
+      }
+    };
 
-const handleTouchMove = (e) => {
-  touchEndX.current = e.touches[0].clientX;
-};
-
-const handleTouchEnd = () => {
-  const diff = touchStartX.current - touchEndX.current;
-
-  if (Math.abs(diff) < 50) return;
-
-  if (diff > 0) {
-    nextImage();
-  } else {
-    prevImage();
-  }
-};
+    fetchReviews();
+  }, [state?._id]);
 
   if (!state) {
     return (
@@ -163,8 +178,7 @@ const handleTouchEnd = () => {
     kategori
   } = state;
 
-  const deskripsiTampil =
-    deskripsiLengkap || deskripsiSingkat || "Belum ada deskripsi.";
+  const deskripsiTampil = deskripsiLengkap || deskripsiSingkat || "Belum ada deskripsi.";
 
   const formatCount = (num) => {
     if (num >= 1000) return `${Math.floor(num / 1000)}RB`;
@@ -190,22 +204,22 @@ const handleTouchEnd = () => {
   };
 
   const renderEditStarsInput = () => {
-  return [1, 2, 3, 4, 5].map((star) => (
-    <span
-      key={star}
-      onClick={() => setEditRatingInput(star)}
-      style={{
-        fontSize: "24px",
-        cursor: "pointer",
-        color: star <= editRatingInput ? "#f4c400" : "#d5d5d5",
-        marginRight: "2px",
-        userSelect: "none"
-      }}
-    >
-      ★
-    </span>
-  ));
-};
+    return [1, 2, 3, 4, 5].map((star) => (
+      <span
+        key={star}
+        onClick={() => setEditRatingInput(star)}
+        style={{
+          fontSize: "24px",
+          cursor: "pointer",
+          color: star <= editRatingInput ? "#f4c400" : "#d5d5d5",
+          marginRight: "2px",
+          userSelect: "none"
+        }}
+      >
+        ★
+      </span>
+    ));
+  };
 
   const renderStarsDisplay = (value) => {
     const starValue = Number(value) || 0;
@@ -222,7 +236,9 @@ const handleTouchEnd = () => {
   const ratingCount = useMemo(() => {
     const count = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
     reviews.forEach((item) => {
-      count[Number(item.rating)] += 1;
+      if (count[Number(item.rating)] !== undefined) {
+        count[Number(item.rating)] += 1;
+      }
     });
     return count;
   }, [reviews]);
@@ -240,6 +256,7 @@ const handleTouchEnd = () => {
       ? reviews
       : reviews.filter((item) => Number(item.rating) === Number(filterBintang));
 
+  // ================= PERBAIKAN TIMEOUT & PROTEKSI FUNGSI TAMBAH ULASAN =================
   const handleTambahUlasan = async () => {
     if (!isiUlasan.trim()) return;
 
@@ -261,41 +278,46 @@ const handleTouchEnd = () => {
         },
         body: JSON.stringify({
           destinasiId: state._id,
-          userId: user?.id,
+          userId: user?.id || user?._id,
           nama: user?.username || "User",
           rating: ratingInput || 5,
           ulasan: isiUlasan
         })
       });
 
-      const data = await res.json(); // Data ulasan baru dari backend
+      const data = await res.json();
 
       if (res.ok) {
-        // PERBAIKAN: Masukkan data baru ke dalam state reviews tanpa perlu fetch ulang
-        setReviews((prevReviews) => [data, ...prevReviews]); 
+        // Proteksi: Ekstrak objek ulasan jika backend membungkusnya di dalam properti review/data
+        const reviewBaru = data.review || data.data || data;
 
-        // Reset form
+        // Memperbarui state secara instan
+        setReviews((prevReviews) => [reviewBaru, ...prevReviews]); 
+
+        // Reset form input
         setIsiUlasan("");
         setRatingInput(0);
         setShowForm(false);
         alert("Ulasan berhasil dikirim!");
       } else {
-        alert(data.message || "Gagal menambahkan ulasan");
+        alert(data.message || "Gagal menambahkan ulasan. Periksa otoritas login Anda.");
       }
     } catch (err) {
       console.error("Gagal tambah ulasan:", err);
-      alert("Gagal menambahkan ulasan");
+      alert("Gagal terhubung ke server. Pastikan koneksi atau alamat API Anda benar.");
     } finally {
+      // Menjamin status loading mati meskipun terjadi crash/error data
       setLoadingReview(false);
     }
   };
+  // =====================================================================================
+
   const handleSelectFilter = (star) => {
     setFilterBintang(star);
     setShowDropdown(false);
   };
 
-  const labelFilter =
-    filterBintang === "all" ? "Semua Bintang" : `${filterBintang} Bintang`;
+  const labelFilter = filterBintang === "all" ? "Semua Bintang" : `${filterBintang} Bintang`;
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Yakin ingin menghapus ulasan?");
@@ -326,109 +348,105 @@ const handleTouchEnd = () => {
     }
   };
 
-const handleLike = async (id) => {
-  if (!user) { navigate("/login"); return; }
-  
-  const token = localStorage.getItem("token");
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/like`, {
-      method: "POST",
-      headers: { 
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json" 
-      }
-    });
+  const handleLike = async (id) => {
+    if (!user) { navigate("/login"); return; }
     
-    if (res.ok) {
-      const updatedReview = await res.json();
-      setReviews(prev => prev.map(r => r._id === id ? updatedReview : r));
-    }
-  } catch (err) {
-    console.error("Gagal like:", err);
-  }
-};
-
-const handleDislike = async (id) => {
-  console.log("Tombol diklik untuk review ID:", id);
-  const token = localStorage.getItem("token");
-  if (!token) { console.log("Token tidak ditemukan!"); return; }
-
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/dislike`, {
-      method: "POST",
-      headers: { 
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      }
-    });
-
-    console.log("Status response:", res.status);
-    
-    if (res.ok) {
-      const updatedReview = await res.json();
-      setReviews(prev => prev.map(r => r._id === id ? updatedReview : r));
-    } else {
-      console.log("Gagal:", await res.text());
-    }
-  } catch (err) {
-    console.error("Error:", err);
-  }
-};
-
-const handleEdit = (review) => {
-  setEditReviewId(review._id);
-  setEditRatingInput(Number(review.rating) || 0);
-  setEditIsiUlasan(review.ulasan || "");
-  setShowEditForm(true);
-  setMenuAktif(null);
-};
-
-const handleSimpanEdit = async () => {
-  if (!editIsiUlasan.trim()) return;
-
-  try {
     const token = localStorage.getItem("token");
-
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/reviews/${editReviewId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          rating: editRatingInput,
-          ulasan: editIsiUlasan
-        })
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/like`, {
+        method: "POST",
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json" 
+        }
+      });
+      
+      if (res.ok) {
+        const updatedReview = await res.json();
+        setReviews(prev => prev.map(r => r._id === id ? (updatedReview.review || updatedReview.data || updatedReview) : r));
       }
-    );
+    } catch (err) {
+      console.error("Gagal like:", err);
+    }
+  };
 
-    const data = await res.json();
+  const handleDislike = async (id) => {
+    if (!user) { navigate("/login"); return; }
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-    if (res.ok) {
-      setReviews((prev) =>
-        prev.map((item) =>
-          item._id === editReviewId
-            ? { ...item, rating: editRatingInput, ulasan: editIsiUlasan }
-            : item
-        )
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${id}/dislike`, {
+        method: "POST",
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      
+      if (res.ok) {
+        const updatedReview = await res.json();
+        setReviews(prev => prev.map(r => r._id === id ? (updatedReview.review || updatedReview.data || updatedReview) : r));
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+
+  const handleEdit = (review) => {
+    setEditReviewId(review._id);
+    setEditRatingInput(Number(review.rating) || 0);
+    setEditIsiUlasan(review.ulasan || "");
+    setShowEditForm(true);
+    setMenuAktif(null);
+  };
+
+  const handleSimpanEdit = async () => {
+    if (!editIsiUlasan.trim()) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/reviews/${editReviewId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            rating: editRatingInput,
+            ulasan: editIsiUlasan
+          })
+        }
       );
 
-      setShowEditForm(false);
-      setEditReviewId(null);
-      setEditRatingInput(0);
-      setEditIsiUlasan("");
+      const data = await res.json();
 
-      alert("Ulasan berhasil diedit");
-    } else {
-      alert(data.message || "Gagal edit ulasan");
+      if (res.ok) {
+        setReviews((prev) =>
+          prev.map((item) =>
+            item._id === editReviewId
+              ? { ...item, rating: editRatingInput, ulasan: editIsiUlasan }
+              : item
+          )
+        );
+
+        setShowEditForm(false);
+        setEditReviewId(null);
+        setEditRatingInput(0);
+        setEditIsiUlasan("");
+
+        alert("Ulasan berhasil diedit");
+      } else {
+        alert(data.message || "Gagal edit ulasan");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Gagal edit ulasan");
     }
-  } catch (error) {
-    console.error(error);
-    alert("Gagal edit ulasan");
-  }
-};
+  };
 
   useEffect(() => {
     const cekStatusFavorit = async () => {
@@ -438,7 +456,7 @@ const handleSimpanEdit = async () => {
         const token = localStorage.getItem("token");
 
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/favorit/${user.id}`,
+          `${import.meta.env.VITE_API_URL}/favorit/${user.id || user?._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -447,8 +465,9 @@ const handleSimpanEdit = async () => {
         );
 
         const data = await response.json();
+        const listFavorit = Array.isArray(data) ? data : data.favorit || data.data || [];
 
-        const sudahFavorit = data.some(
+        const sudahFavorit = listFavorit.some(
           (fav) => fav.destinasiId?._id === state._id || fav.destinasiId === state._id
         );
 
@@ -482,7 +501,7 @@ const handleSimpanEdit = async () => {
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          userId: user.id,
+          userId: user.id || user?._id,
           destinasiId: state._id
         })
       });
@@ -500,27 +519,6 @@ const handleSimpanEdit = async () => {
       alert("Gagal terhubung ke server backend");
     }
   };
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      if (!state?._id) return;
-
-      setReviews([]); 
-      setLoadingReview(true);
-
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/reviews/${state._id}`
-        );
-        const data = await res.json();
-        setReviews(data);
-      } catch (err) {
-        console.error("Gagal ambil reviews:", err);
-      }
-    };
-
-    fetchReviews();
-  }, [state?._id]);
 
   return (
     <div
@@ -794,9 +792,7 @@ const handleSimpanEdit = async () => {
                 marginBottom: "12px"
               }}
             >
-              {averageRating}{" "}
-              <span style={{ color: "#f4c400" }}>⭐</span> Ulasan Pengunjung (
-              {formatCount(totalReviews)})
+              {averageRating} <span style={{ color: "#f4c400" }}>⭐</span> Ulasan Pengunjung ({formatCount(totalReviews)})
             </div>
 
             {!showForm && (
@@ -1007,6 +1003,7 @@ const handleSimpanEdit = async () => {
               </div>
             </div>
           )}
+
           {/* FORM REVIEW */}
           {showForm ? (
             <div
@@ -1124,80 +1121,78 @@ const handleSimpanEdit = async () => {
             </div>
           ) : (
             <div style={{ marginBottom: "10px" }}>
-                  {filteredReviews.length > 0 ? (
-                    (showAllReviews
-                      ? filteredReviews
-                      : filteredReviews.slice(0, 5)
-                    ).map((item, index) => {
-                    const ownerId = item.userId?._id || item.userId;
-                    const isOwner = user?.id === ownerId;
-                    const username = item.userId?.username || item.nama || "user";
+              {filteredReviews.length > 0 ? (
+                (showAllReviews
+                  ? filteredReviews
+                  : filteredReviews.slice(0, 5)
+                ).map((item, index) => {
+                  const ownerId = item.userId?._id || item.userId;
+                  const isOwner = user?.id === ownerId || user?._id === ownerId;
+                  const username = item.userId?.username || item.nama || "user";
 
-                    return (
-                      <div
-                        key={item._id || index}
-                        style={{
-                          padding: "16px 0",
-                          borderBottom: "1px solid #e5e5e5"
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
-                          {/* Avatar */}
-                          <div style={{ width: "42px", height: "42px", borderRadius: "50%", backgroundColor: "#a64ac9", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: "18px", flexShrink: 0 }}>
-                            {username.charAt(0).toUpperCase()}
+                  return (
+                    <div
+                      key={item._id || index}
+                      style={{
+                        padding: "16px 0",
+                        borderBottom: "1px solid #e5e5e5"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                        {/* Avatar */}
+                        <div style={{ width: "42px", height: "42px", borderRadius: "50%", backgroundColor: "#a64ac9", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: "18px", flexShrink: 0 }}>
+                          {username.charAt(0).toUpperCase()}
+                        </div>
+
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+                            <span style={{ fontWeight: "600", fontSize: "14px" }}>@{username}</span>
+                            <span style={{ fontSize: "13px", color: "#777" }}>
+                              {item.createdAt ? new Date(item.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : ""}
+                            </span>
                           </div>
 
-                          <div style={{ flex: 1 }}>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-                              <span style={{ fontWeight: "600", fontSize: "14px" }}>@{username}</span>
-                              <span style={{ fontSize: "13px", color: "#777" }}>
-                                {item.createdAt ? new Date(item.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : ""}
-                              </span>
-                            </div>
-
-                            <div style={{ marginBottom: "10px" }}>{renderStarsDisplay(item.rating)}</div>
-                            <div style={{ fontSize: "15px", color: "#111", marginBottom: "10px", lineHeight: "1.6" }}>{item.ulasan}</div>
-                           
-                            {/* --- BAGIAN LIKE & DISLIKE YANG DIPERBAIKI --- */}
-                            <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
-                            
-                              {/* TOMBOL LIKE */}
-                              <div
-                                onClick={() => handleLike(item._id)}
-                                style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", userSelect: "none", zIndex: 10 }}
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" 
-                                    fill={item.likes && item.likes.includes(user?.id) ? "#000" : "none"} 
-                                    stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M7 10v12" />
-                                  <path d="M15 5.88L14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h3l4-7a2 2 0 0 1 4 1.88Z" />
-                                </svg>
-                                <span style={{ fontSize: "12px", color: "#555", fontWeight: "500" }}>{item.likes ? item.likes.length : 0}</span>
-                              </div>
-
-                              {/* TOMBOL DISLIKE */}
-                              <div
-                                onClick={() => handleDislike(item._id)}
-                                style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", userSelect: "none", zIndex: 10 }}
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" 
-                                    fill={item.dislikes && item.dislikes.includes(user?.id) ? "#000" : "none"} 
-                                    stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M17 14V2" />
-                                  <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3l-4 7a2 2 0 0 1-4-1.88Z" />
-                                </svg>
-                                <span style={{ fontSize: "12px", color: "#555", fontWeight: "500" }}>{item.dislikes ? item.dislikes.length : 0}</span>
-                              </div>
-                            </div>
-                            {/* --- AKHIR PERBAIKAN --- */}
-                          </div>
+                          <div style={{ marginBottom: "10px" }}>{renderStarsDisplay(item.rating)}</div>
+                          <div style={{ fontSize: "15px", color: "#111", marginBottom: "10px", lineHeight: "1.6" }}>{item.ulasan}</div>
+                         
+                          {/* --- BAGIAN LIKE & DISLIKE YANG DIPERBAIKI --- */}
+                          <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
                           
-                          {isOwner ? (
+                            {/* TOMBOL LIKE */}
+                            <div
+                              onClick={() => handleLike(item._id)}
+                              style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", userSelect: "none", zIndex: 10 }}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" 
+                                  fill={item.likes && item.likes.includes(user?.id || user?._id) ? "#000" : "none"} 
+                                  stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M7 10v12" />
+                                <path d="M15 5.88L14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h3l4-7a2 2 0 0 1 4 1.88Z" />
+                              </svg>
+                              <span style={{ fontSize: "12px", color: "#555", fontWeight: "500" }}>{item.likes ? item.likes.length : 0}</span>
+                            </div>
+
+                            {/* TOMBOL DISLIKE */}
+                            <div
+                              onClick={() => handleDislike(item._id)}
+                              style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", userSelect: "none", zIndex: 10 }}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" 
+                                  fill={item.dislikes && item.dislikes.includes(user?.id || user?._id) ? "#000" : "none"} 
+                                  stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M17 14V2" />
+                                <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3l-4 7a2 2 0 0 1-4-1.88Z" />
+                              </svg>
+                              <span style={{ fontSize: "12px", color: "#555", fontWeight: "500" }}>{item.dislikes ? item.dislikes.length : 0}</span>
+                            </div>
+                          </div>
+                          {/* --- AKHIR PERBAIKAN --- */}
+                        </div>
+                        
+                        {isOwner ? (
                           <div style={{ position: "relative" }}>
                             <button
-                              onClick={() =>
-                                setMenuAktif(menuAktif === item._id ? null : item._id)
-                              }
+                              onClick={() => setMenuAktif(menuAktif === item._id ? null : item._id)}
                               style={{
                                 border: "none",
                                 background: "none",
@@ -1348,9 +1343,7 @@ const handleSimpanEdit = async () => {
                   }}
                 >
                   <button
-                    onClick={() =>
-                      setShowAllReviews(!showAllReviews)
-                    }
+                    onClick={() => setShowAllReviews(!showAllReviews)}
                     style={{
                       padding: "10px 20px",
                       borderRadius: "10px",
@@ -1371,241 +1364,239 @@ const handleSimpanEdit = async () => {
         </div>
       </div>
 
-{selectedImage && (
-  <div
-    onClick={() => setSelectedImage(null)}
-    onTouchStart={handleTouchStart}
-    onTouchMove={handleTouchMove}
-    onTouchEnd={handleTouchEnd}
-    style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      backgroundColor: "rgba(0,0,0,0.9)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 9999,
-      overflow: "hidden"
-    }}
-  >
-
-{!isMobile && (
-  <div
-    onMouseEnter={() => setHoverSide("left")}
-    onMouseLeave={() => setHoverSide(null)}
-    onClick={(e) => {
-      e.stopPropagation();
-      prevImage();
-    }}
-    style={{
-      position: "absolute",
-      left: 0,
-      top: 0,
-      width: "25%",
-      height: "100%",
-      zIndex: 10000,
-      cursor: "default"
-    }}
-  >
-  {hoverSide === "left" && (
-  <div
-    style={{
-      position: "absolute",
-      left: "24px",
-      top: "50%",
-      transform: "translateY(-50%)",
-      width: "32px",
-      height: "32px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "transparent",
-      border: "none",
-      boxShadow: "none"
-    }}
-  >
-    <span
-      style={{
-        color: "#fff",
-        fontSize: "30px",
-        fontWeight: "700",
-        lineHeight: 1,
-        textShadow: "0 2px 8px rgba(0,0,0,0.8)"
-      }}
-    >
-      ‹
-    </span>
-  </div>
-)}
-  </div>
-)}
-
-{!isMobile && (
-  <div
-    onMouseEnter={() => setHoverSide("right")}
-    onMouseLeave={() => setHoverSide(null)}
-    onClick={(e) => {
-      e.stopPropagation();
-      nextImage();
-    }}
-    style={{
-      position: "absolute",
-      right: 0,
-      top: 0,
-      width: "25%",
-      height: "100%",
-      zIndex: 10000,
-      cursor: "default"
-    }}
-  >
- {hoverSide === "right" && (
-  <div
-    style={{
-      position: "absolute",
-      right: "24px",
-      top: "50%",
-      transform: "translateY(-50%)",
-      width: "32px",
-      height: "32px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "transparent",
-      border: "none",
-      boxShadow: "none"
-    }}
-  >
-    <span
-      style={{
-        color: "#fff",
-        fontSize: "30px",
-        fontWeight: "700",
-        lineHeight: 1,
-        textShadow: "0 2px 8px rgba(0,0,0,0.8)"
-      }}
-    >
-      ›
-    </span>
-  </div>
-)}
-  </div>
-)}
-    {/* Gambar */}
-      <img
-        src={selectedImage}
-        alt="preview"
-        onClick={(e) => e.stopPropagation()}
-        onDoubleClick={() =>
-          setZoom(zoom === 1 ? 2 : 1)
-        }
-        style={{
-          maxWidth: "80%",
-          maxHeight: "80%",
-          objectFit: "contain",
-          borderRadius: "14px",
-          transform: `scale(${zoom})`,
-          transition: "0.3s ease",
-          zIndex: 10000
-        }}
-      />
-
-    {/* Tombol Zoom */}
-      <div
-        onClick={(e) => e.stopPropagation()}
-        onTouchStart={(e) => e.stopPropagation()}
-        onTouchMove={(e) => e.stopPropagation()}
-        onTouchEnd={(e) => e.stopPropagation()}
-        style={{
-          position: "absolute",
-          bottom: "30px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          display: "flex",
-          gap: "15px",
-          zIndex: 10001
-        }}
-      >
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            zoomOut();
-          }}
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchMove={(e) => e.stopPropagation()}
-          onTouchEnd={(e) => e.stopPropagation()}
+      {selectedImage && (
+        <div
+          onClick={() => setSelectedImage(null)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
           style={{
-            width: "55px",
-            height: "55px",
-            borderRadius: "50%",
-            border: "none",
-            background: "#fff",
-            fontSize: "32px",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.9)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            overflow: "hidden"
           }}
         >
-          −
-        </button>
+          {!isMobile && (
+            <div
+              onMouseEnter={() => setHoverSide("left")}
+              onMouseLeave={() => setHoverSide(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                prevImage();
+              }}
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "25%",
+                height: "100%",
+                zIndex: 10000,
+                cursor: "default"
+              }}
+            >
+              {hoverSide === "left" && (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "24px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: "32px",
+                    height: "32px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "transparent",
+                    border: "none",
+                    boxShadow: "none"
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#fff",
+                      fontSize: "30px",
+                      fontWeight: "700",
+                      lineShadow: 1,
+                      textShadow: "0 2px 8px rgba(0,0,0,0.8)"
+                    }}
+                  >
+                    ‹
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            zoomIn();
-          }}
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchMove={(e) => e.stopPropagation()}
-          onTouchEnd={(e) => e.stopPropagation()}
-          style={{
-            width: "55px",
-            height: "55px",
-            borderRadius: "50%",
-            border: "none",
-            background: "#fff",
-            fontSize: "32px",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
-          }}
-        >
-          +
-        </button>
-      </div>
+          {!isMobile && (
+            <div
+              onMouseEnter={() => setHoverSide("right")}
+              onMouseLeave={() => setHoverSide(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                nextImage();
+              }}
+              style={{
+                position: "absolute",
+                right: 0,
+                top: "25%",
+                width: "25%",
+                height: "100%",
+                zIndex: 10000,
+                cursor: "default"
+              }}
+            >
+              {hoverSide === "right" && (
+                <div
+                  style={{
+                    position: "absolute",
+                    right: "24px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: "32px",
+                    height: "32px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "transparent",
+                    border: "none",
+                    boxShadow: "none"
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#fff",
+                      fontSize: "30px",
+                      fontWeight: "700",
+                      lineHeight: 1,
+                      textShadow: "0 2px 8px rgba(0,0,0,0.8)"
+                    }}
+                  >
+                    ›
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
-    {/* Tombol Tutup */}
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        setSelectedImage(null);
-      }}
-      onTouchStart={(e) => e.stopPropagation()}
-      onTouchMove={(e) => e.stopPropagation()}
-      onTouchEnd={(e) => e.stopPropagation()}
-      style={{
-        position: "absolute",
-        top: "20px",
-        right: "20px",
-        width: "50px",
-        height: "50px",
-        borderRadius: "50%",
-        border: "none",
-        backgroundColor: "#fff",
-        color: "#111",
-        fontSize: "28px",
-        fontWeight: "bold",
-        cursor: "pointer",
-        zIndex: 10001
-      }}
-    >
-      ×
-    </button>
-  </div>
-)}
+          {/* Gambar */}
+          <img
+            src={selectedImage}
+            alt="preview"
+            onClick={(e) => e.stopPropagation()}
+            onDoubleClick={() => setZoom(zoom === 1 ? 2 : 1)}
+            style={{
+              maxWidth: "80%",
+              maxHeight: "80%",
+              objectFit: "contain",
+              borderRadius: "14px",
+              transform: `scale(${zoom})`,
+              transition: "0.3s ease",
+              zIndex: 10000
+            }}
+          />
+
+          {/* Tombol Zoom */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            style={{
+              position: "absolute",
+              bottom: "30px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              gap: "15px",
+              zIndex: 10001
+            }}
+          >
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                zoomOut();
+              }}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+              style={{
+                width: "55px",
+                height: "55px",
+                borderRadius: "50%",
+                border: "none",
+                background: "#fff",
+                fontSize: "32px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+              }}
+            >
+              −
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                zoomIn();
+              }}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+              style={{
+                width: "55px",
+                height: "55px",
+                borderRadius: "50%",
+                border: "none",
+                background: "#fff",
+                fontSize: "32px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+              }}
+            >
+              +
+            </button>
+          </div>
+
+          {/* Tombol Tutup */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedImage(null);
+            }}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            style={{
+              position: "absolute",
+              top: "20px",
+              right: "20px",
+              width: "50px",
+              height: "50px",
+              borderRadius: "50%",
+              border: "none",
+              backgroundColor: "#fff",
+              color: "#111",
+              fontSize: "28px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              zIndex: 10001
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 };
