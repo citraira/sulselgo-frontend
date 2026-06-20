@@ -7,11 +7,21 @@ const KategoriPage = () => {
   const navigate = useNavigate();
   const [destinasiList, setDestinasiList] = useState([]);
   const location = useLocation();
-  const isMobile = window.innerWidth <= 768; // Menambahkan variabel deteksi layar responsif
+  const isMobile = window.innerWidth <= 768; 
 
   const [selectedKategori, setSelectedKategori] = useState(
     location.state?.selectedKategori || null
   );
+
+  // ================= PERBAIKAN: FORCE SCROLL TO TOP SAAT KATEGORI DIPILIH =================
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant" // Memaksa halaman langsung berada di paling atas tanpa animasi smooth
+    });
+  }, [selectedKategori]); // Akan berjalan setiap kali kategori diklik atau di-reset
+  // =======================================================================================
 
   useEffect(() => {
     API.get("/destinasi")
@@ -37,7 +47,7 @@ const KategoriPage = () => {
   // Data yang sudah difilter berdasarkan kategori yang diklik
   const filteredDestinasi = destinasiList.filter(item => item.kategori === selectedKategori);
 
-  // Jika kategori dipilih, tampilkan halaman daftar destinasi
+  // Jika kategori dipilih, tampilkan halaman daftar destinasi (Seperti di gambar image_9450a5.jpg)
   if (selectedKategori) {
     return (
       <div style={{ backgroundColor: '#fff', minHeight: '100vh', paddingTop: '100px', paddingLeft: '6%', paddingRight: '6%' }}>
@@ -145,7 +155,6 @@ const KategoriPage = () => {
   return (
     <div style={{ backgroundColor: '#fff', minHeight: '100vh', paddingTop: '70px' }}>
 
-      {/* PERBAIKAN: Tinggi disamakan secara responsif dengan DestinasiPage */}
       <div style={{
         height: isMobile ? '280px' : '380px',
         width: '100%',
