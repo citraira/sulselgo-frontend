@@ -116,6 +116,7 @@ const LandingPage = () => {
         padding: 0
       }}
     >
+      {/* GLOBAL KEYFRAME ANIMASI SKELETON */}
       <style>{`
         .slider-arrow {
           cursor: pointer;
@@ -132,6 +133,15 @@ const LandingPage = () => {
 
         .slider-arrow:hover {
           transform: scale(1.2);
+        }
+
+        @keyframes pulse {
+          0% { background-color: #e0e0e0; }
+          50% { background-color: #edf0f2; }
+          100% { background-color: #e0e0e0; }
+        }
+        .skeleton-box {
+          animation: pulse 1.5s infinite ease-in-out;
         }
       `}</style>
 
@@ -276,7 +286,7 @@ const LandingPage = () => {
         >
           {Array.isArray(slides) &&
             slides.slice(0, 4).map((item, i) => {
-              // 🚀 PERBAIKAN: Hitung ulasan bersih langsung di dalam perulangan .map() kartu
+              // Hitung ulasan bersih langsung di dalam perulangan .map() kartu[cite: 7]
               const rawReviews = item.reviews || item.destinasi?.reviews || [];
               
               const cleanReviews = rawReviews.filter(rev => {
@@ -298,63 +308,101 @@ const LandingPage = () => {
                 ? (cleanReviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / totalReviewClean).toFixed(1)
                 : "0";
 
+              // 🚀 MODIFIKASI: Memakai sub-komponen terisolasi state agar skeleton loading bekerja per item kartu
               return (
-                <div
-                  key={i}
-                  onClick={() => handleCardClick(item)}
-                  style={{
-                    height: isMobile ? '320px' : '450px',
-                    borderRadius: '25px',
-                    overflow: 'hidden',
-                    position: 'relative',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <img
-                    src={item.gambar || item.destinasi?.gambar}
-                    alt={item.nama || item.destinasi?.nama}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover'
-                    }}
-                  />
-
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      width: '100%',
-                      padding: '30px',
-                      background: 'linear-gradient(transparent, rgba(0,0,0,0.95))',
-                      textAlign: 'left'
-                    }}
-                  >
-                    <h3 style={{ margin: 0, fontSize: '22px', fontWeight: '600' }}>
-                      {item.nama || item.destinasi?.nama}
-                    </h3>
-
-                    <p style={{ fontSize: '14px', margin: '8px 0 0', opacity: 0.85 }}>
-                      📍 {item.kabupaten || item.destinasi?.kabupaten}
-                    </p>
-
-                    {/* TAMPILAN RATARATA BINTANG DAN JUMLAH ULASAN YANG SUDAH BERSIH */}
-                    <p
-                      style={{
-                        fontSize: '14px',
-                        marginTop: '10px',
-                        color: '#ffd700',
-                        fontWeight: '600'
-                      }}
-                    >
-                      ⭐ {avgRatingClean} • {totalReviewClean} ulasan
-                    </p>
-                  </div>
-                </div>
+                <LandingCardKeyed
+                  key={item?._id || i}
+                  item={item}
+                  isMobile={isMobile}
+                  handleCardClick={handleCardClick}
+                  avgRatingClean={avgRatingClean}
+                  totalReviewClean={totalReviewClean}
+                />
               );
             })}
         </div>
+      </div>
+    </div>
+  );
+};
+
+// ================= SUB-KOMPONEN HELPER UNTUK SKELETON LOADER DI LANDING PAGE =================
+const LandingCardKeyed = ({ item, isMobile, handleCardClick, avgRatingClean, totalReviewClean }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <div
+      onClick={() => handleCardClick(item)}
+      style={{
+        height: isMobile ? '320px' : '450px',
+        borderRadius: '25px',
+        overflow: 'hidden',
+        position: 'relative',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+        cursor: 'pointer',
+        backgroundColor: '#e0e0e0' // Warna penahan dasar saat proses unduh gambar
+      }}
+    >
+      {/* KOTAK ANIMASI SKELETON BERDENYUT */}
+      {!isLoaded && (
+        <div 
+          className="skeleton-box" 
+          style={{ 
+            width: '100%', 
+            height: '100%', 
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            zIndex: 2 
+          }} 
+        />
+      )}
+
+      {/* IMAGE UTAMA */}
+      <img
+        src={item.gambar || item.destinasi?.gambar}
+        alt={item.nama || item.destinasi?.nama}
+        onLoad={() => setIsLoaded(true)} // Mengubah status mendunduh file setelah selesai
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          opacity: isLoaded ? 1 : 0, // Gambar disembunyikan sampai tuntas diunduh
+          transition: 'opacity 0.4s ease-in-out' // Efek transisi fade-in memudar masuk halus
+        }}
+      />
+
+      {/* OVERLAY TEKS */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          width: '100%',
+          padding: '30px',
+          background: 'linear-gradient(transparent, rgba(0,0,0,0.95))',
+          textAlign: 'left',
+          zIndex: 3
+        }}
+      >
+        <h3 style={{ margin: 0, fontSize: '22px', fontWeight: '600', color: '#fff' }}>
+          {item.nama || item.destinasi?.nama}
+        </h3>
+
+        <p style={{ fontSize: '14px', margin: '8px 0 0', opacity: 0.85, color: '#fff' }}>
+          📍 {item.kabupaten || item.destinasi?.kabupaten}
+        </p>
+
+        {/* TAMPILAN RATARATA BINTANG DAN JUMLAH ULASAN YANG SUDAH BERSIH */}
+        <p
+          style={{
+            fontSize: '14px',
+            marginTop: '10px',
+            color: '#ffd700',
+            fontWeight: '600'
+          }}
+        >
+          ⭐ {avgRatingClean} • {totalReviewClean} ulasan
+        </p>
       </div>
     </div>
   );

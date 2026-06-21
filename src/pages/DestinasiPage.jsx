@@ -152,6 +152,18 @@ const DestinasiPage = () => {
 
   return (
     <div style={{ backgroundColor: '#fff', minHeight: '100vh', paddingTop: '70px' }}>
+      
+      {/* GLOBAL KEYFRAME ANIMASI PULSE SKELETON */}
+      <style>{`
+        @keyframes pulse {
+          0% { background-color: #e0e0e0; }
+          50% { background-color: #edf0f2; }
+          100% { background-color: #e0e0e0; }
+        }
+        .skeleton-box {
+          animation: pulse 1.5s infinite ease-in-out;
+        }
+      `}</style>
 
       {/* HERO */}
       <div style={{
@@ -264,7 +276,7 @@ const DestinasiPage = () => {
           {topDestinasi.map((item, idx) => {
             const data = item.destinasi || item;
 
-            // 🚀 PERBAIKAN: Hitung ulasan bersih langsung di dalam fungsi .map() kartu destinasi
+            // Hitung ulasan bersih langsung di dalam fungsi .map() kartu destinasi
             const rawReviews = item.reviews || data.reviews || [];
             
             const cleanReviews = rawReviews.filter(rev => {
@@ -286,89 +298,137 @@ const DestinasiPage = () => {
               ? (cleanReviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / totalReviewClean).toFixed(1)
               : "0";
 
+            // 🚀 MODIFIKASI: Memakai sub-komponen terisolasi state agar skeleton loading bekerja per item kartu
             return (
-              <div
-                key={idx}
-                onClick={() => handleClickDestinasi(item)}
-                style={{
-                  width: isMobile ? '260px' : '350px',
-                  minWidth: isMobile ? '260px' : '350px',
-                  height: isMobile ? '260px' : '350px',
-                  borderRadius: '25px',
-                  overflow: 'hidden',
-                  position: 'relative',
-                  border: '5px solid #fff',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                  cursor: 'pointer'
-                }}
-              >
-                {/* LOVE */}
-                <div
-                  onClick={(e) => toggleFavorite(e, data)}
-                  style={{
-                    position: 'absolute', 
-                    top: '15px', 
-                    right: '15px',
-                    backgroundColor: 'rgba(255,255,255,0.95)',
-                    width: '40px', 
-                    height: '40px',
-                    borderRadius: '50%',
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    zIndex: 10,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    margin: '5px' 
-                  }}
-                >
-                  <svg 
-                    width="22" height="22" viewBox="0 0 24 24"
-                    fill={favorites.includes(data._id) ? "#d93025" : "none"}
-                    stroke={favorites.includes(data._id) ? "#d93025" : "#333"}
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                  </svg>
-                </div>
-
-                <img src={data.gambar || gambarDefault} alt={data.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-
-                {/* OVERLAY TEKS DENGAN JUMLAH ULASAN BERSIH */}
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  color: '#fff',
-                  padding: '20px',
-                  width: '100%',
-                  background: 'linear-gradient(transparent, rgba(0,0,0,0.85))',
-                  boxSizing: 'border-box'
-                }}>
-                  <div style={{ fontSize: isMobile ? '18px' : '22px', fontWeight: '800' }}>
-                    {data.nama}
-                  </div>
-                  <div style={{ opacity: 0.85, fontSize: '14px', marginTop: '2px' }}>
-                    📍 {data.kabupaten}
-                  </div>
-                  
-                  {/* TAMPILAN RATARATA BINTANG DAN JUMLAH ULASAN YANG SUDAH BERSIH */}
-                  <div style={{
-                    fontSize: '14px',
-                    marginTop: '6px',
-                    color: '#ffd700',
-                    fontWeight: '600'
-                  }}>
-                    ⭐ {avgRatingClean} • {totalReviewClean} ulasan
-                  </div>
-                </div>
-
-              </div>
+              <DestinasiCardKeyed 
+                key={item?._id || idx} 
+                item={item} 
+                data={data} 
+                isMobile={isMobile} 
+                favorites={favorites} 
+                toggleFavorite={toggleFavorite} 
+                handleClickDestinasi={handleClickDestinasi} 
+                avgRatingClean={avgRatingClean} 
+                totalReviewClean={totalReviewClean} 
+                gambarDefault={gambarDefault}
+              />
             );
           })}
         </div>
       </div>
+    </div>
+  );
+};
+
+// ================= SUb-KOMPONEN HELPER UNTUK SKELETON LOADER IMAGE CARD =================
+const DestinasiCardKeyed = ({ item, data, isMobile, favorites, toggleFavorite, handleClickDestinasi, avgRatingClean, totalReviewClean, gambarDefault }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <div
+      onClick={() => handleClickDestinasi(item)}
+      style={{
+        width: isMobile ? '260px' : '350px',
+        minWidth: isMobile ? '260px' : '350px',
+        height: isMobile ? '260px' : '350px',
+        borderRadius: '25px',
+        overflow: 'hidden',
+        position: 'relative',
+        border: '5px solid #fff',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+        cursor: 'pointer',
+        backgroundColor: '#e0e0e0' // Warna penahan dasar saat proses unduh gambar
+      }}
+    >
+      {/* LOVE BUTTON */}
+      <div
+        onClick={(e) => toggleFavorite(e, data)}
+        style={{
+          position: 'absolute', 
+          top: '15px', 
+          right: '15px',
+          backgroundColor: 'rgba(255,255,255,0.95)',
+          width: '40px', 
+          height: '40px',
+          borderRadius: '50%',
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          cursor: 'pointer',
+          zIndex: 10,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          margin: '5px' 
+        }}
+      >
+        <svg 
+          width="22" height="22" viewBox="0 0 24 24"
+          fill={favorites.includes(data._id) ? "#d93025" : "none"}
+          stroke={favorites.includes(data._id) ? "#d93025" : "#333"}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </div>
+
+      {/* KOTAK ANIMASI SKELETON BERDENYUT */}
+      {!isLoaded && (
+        <div 
+          className="skeleton-box" 
+          style={{ 
+            width: '100%', 
+            height: '100%', 
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            zIndex: 2 
+          }} 
+        />
+      )}
+
+      {/* IMAGE DARI SERVER HOSTINGER */}
+      <img 
+        src={data.gambar || gambarDefault} 
+        alt={data.nama} 
+        onLoad={() => setIsLoaded(true)} // Mengubah status mendunduh file setelah selesai
+        style={{ 
+          width: '100%', 
+          height: '100%', 
+          objectFit: 'cover',
+          opacity: isLoaded ? 1 : 0, // Gambar disembunyikan sampai tuntas diunduh
+          transition: 'opacity 0.4s ease-in-out' // Efek transisi fade-in memudar masuk halus
+        }} 
+      />
+
+      {/* OVERLAY TEKS */}
+      <div style={{
+        position: 'absolute',
+        bottom: 0,
+        color: '#fff',
+        padding: '20px',
+        width: '100%',
+        background: 'linear-gradient(transparent, rgba(0,0,0,0.85))',
+        boxSizing: 'border-box',
+        zIndex: 3
+      }}>
+        <div style={{ fontSize: isMobile ? '18px' : '22px', fontWeight: '800' }}>
+          {data.nama}
+        </div>
+        <div style={{ opacity: 0.85, fontSize: '14px', marginTop: '2px' }}>
+          📍 {data.kabupaten}
+        </div>
+        
+        <div style={{
+          fontSize: '14px',
+          marginTop: '6px',
+          color: '#ffd700',
+          fontWeight: '600'
+        }}>
+          ⭐ {avgRatingClean} • {totalReviewClean} ulasan
+        </div>
+      </div>
+
     </div>
   );
 };

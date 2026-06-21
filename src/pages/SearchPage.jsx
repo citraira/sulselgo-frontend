@@ -152,6 +152,35 @@ export default function SearchPage() {
         paddingBottom: "60px"
       }}
     >
+      {/* GLOBAL KEYFRAME ANIMASI SKELETON */}
+      <style>{`
+        .slider-arrow {
+          cursor: pointer;
+          font-size: 20px;
+          font-weight: 800;
+          user-select: none;
+          transition: transform 0.2s;
+          display: flex;
+          align-items: center;
+          justifyContent: center;
+          width: 30px;
+          height: 30px;
+        }
+
+        .slider-arrow:hover {
+          transform: scale(1.2);
+        }
+
+        @keyframes pulse {
+          0% { background-color: #e0e0e0; }
+          50% { background-color: #edf0f2; }
+          100% { background-color: #e0e0e0; }
+        }
+        .skeleton-box {
+          animation: pulse 1.5s infinite ease-in-out;
+        }
+      `}</style>
+
       {/* BACK BUTTON */}
       <button
         onClick={() => navigate('/')}
@@ -470,7 +499,7 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* ================= LIVE SEARCH ================= */}
+      {/* ================= LIVE SEARCH RESULT ================= */}
       {!showFullResult && results.length > 0 && (
         <div style={{ width: "88%", margin: "50px auto" }}>
           <h2 style={{ marginBottom: "25px", fontSize: "28px", fontWeight: "800" }}>
@@ -478,41 +507,7 @@ export default function SearchPage() {
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
             {results.map((item) => (
-              <div
-                key={item._id}
-                onClick={() => navigate("/detail", { state: item })}
-                style={{
-                  background: "#fff",
-                  borderRadius: "22px",
-                  padding: isMobile ? "12px" : "16px",
-                  display: "flex",
-                  flexDirection: isMobile ? "column" : "row",
-                  alignItems: isMobile ? "flex-start" : "center",
-                  gap: isMobile ? "12px" : "20px",
-                  cursor: "pointer",
-                  boxShadow: "0 6px 18px rgba(0,0,0,0.08)"
-                }}
-              >
-                <img
-                  src={item.gambar}
-                  alt={item.nama}
-                  style={{
-                    width: isMobile ? "100%" : "140px",
-                    height: isMobile ? "180px" : "100px",
-                    objectFit: "cover",
-                    borderRadius: "18px"
-                  }}
-                />
-                <div style={{ width: "100%" }}>
-                  <h3 style={{ marginBottom: "8px", fontSize: isMobile ? "20px" : "22px", lineHeight: "1.3", wordBreak: "break-word" }}>
-                    {item.nama}
-                  </h3>
-                  <p style={{ color: "#800000", fontWeight: "700", marginBottom: "6px" }}>
-                    {item.kategori}
-                  </p>
-                  <p>📍 {item.kabupaten}</p>
-                </div>
-              </div>
+              <LiveSearchCardKeyed key={item._id} item={item} isMobile={isMobile} navigate={navigate} />
             ))}
           </div>
         </div>
@@ -555,53 +550,7 @@ export default function SearchPage() {
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(330px, 1fr))", gap: "30px" }}>
             {results.map((item) => (
-              <div
-                key={item._id}
-                onClick={() => navigate("/detail", { state: item })}
-                style={{
-                  background: "#fff",
-                  borderRadius: "28px",
-                  overflow: "hidden",
-                  cursor: "pointer",
-                  boxShadow: "0 12px 25px rgba(0,0,0,0.12)"
-                }}
-              >
-                <div style={{ position: "relative" }}>
-                  <img
-                    src={item.gambar}
-                    alt={item.nama}
-                    style={{ width: "100%", height: isMobile ? "180px" : "250px", objectFit: "cover" }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "18px",
-                      left: "18px",
-                      background: "#800000",
-                      color: "#fff",
-                      padding: "10px 16px",
-                      borderRadius: "30px",
-                      fontSize: "13px",
-                      fontWeight: "700"
-                    }}
-                  >
-                    {item.kategori}
-                  </div>
-                </div>
-
-                <div style={{ padding: "24px" }}>
-                  <h2 style={{ marginBottom: "12px", fontSize: isMobile ? "20px" : "26px" }}>
-                    {item.nama}
-                  </h2>
-                  <p style={{ color: "#666", lineHeight: "1.8", marginBottom: "18px" }}>
-                    {item.deskripsiSingkat?.slice(0, 120)}...
-                  </p>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontWeight: "700" }}>📍 {item.kabupaten}</span>
-                    <span style={{ color: "#800000", fontWeight: "800" }}>Detail →</span>
-                  </div>
-                </div>
-              </div>
+              <FullSearchCardKeyed key={item._id} item={item} isMobile={isMobile} navigate={navigate} />
             ))}
           </div>
         </div>
@@ -624,3 +573,123 @@ export default function SearchPage() {
     </div>
   );
 }
+
+// ================= SUB-KOMPONEN HELPER 1: LIVE SEARCH CARD SKELETON =================
+const LiveSearchCardKeyed = ({ item, isMobile, navigate }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <div
+      onClick={() => navigate("/detail", { state: item })}
+      style={{
+        background: "#fff",
+        borderRadius: "22px",
+        padding: isMobile ? "12px" : "16px",
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        alignItems: isMobile ? "flex-start" : "center",
+        gap: isMobile ? "12px" : "20px",
+        cursor: "pointer",
+        boxShadow: "0 6px 18px rgba(0,0,0,0.08)"
+      }}
+    >
+      <div 
+        style={{ 
+          width: isMobile ? "100%" : "140px",
+          height: isMobile ? "180px" : "100px",
+          position: "relative",
+          borderRadius: "18px",
+          overflow: "hidden",
+          backgroundColor: "#e0e0e0",
+          flexShrink: 0
+        }}
+      >
+        {!isLoaded && <div className="skeleton-box" style={{ width: "100%", height: "100%", position: "absolute", top: 0, left: 0, zIndex: 2 }} />}
+        <img
+          src={item.gambar}
+          alt={item.nama}
+          onLoad={() => setIsLoaded(true)}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            opacity: isLoaded ? 1 : 0,
+            transition: "opacity 0.4s ease-in-out"
+          }}
+        />
+      </div>
+      <div style={{ width: "100%" }}>
+        <h3 style={{ marginBottom: "8px", fontSize: isMobile ? "20px" : "22px", lineHeight: "1.3", wordBreak: "break-word" }}>
+          {item.nama}
+        </h3>
+        <p style={{ color: "#800000", fontWeight: "700", marginBottom: "6px" }}>
+          {item.kategori}
+        </p>
+        <p>📍 {item.kabupaten}</p>
+      </div>
+    </div>
+  );
+};
+
+// ================= SUB-KOMPONEN HELPER 2: FULL SEARCH CARD SKELETON =================
+const FullSearchCardKeyed = ({ item, isMobile, navigate }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <div
+      onClick={() => navigate("/detail", { state: item })}
+      style={{
+        background: "#fff",
+        borderRadius: "28px",
+        overflow: "hidden",
+        cursor: "pointer",
+        boxShadow: "0 12px 25px rgba(0,0,0,0.12)"
+      }}
+    >
+      <div style={{ position: "relative", width: "100%", height: isMobile ? "180px" : "250px", backgroundColor: "#e0e0e0" }}>
+        {!isLoaded && <div className="skeleton-box" style={{ width: "100%", height: "100%", position: "absolute", top: 0, left: 0, zIndex: 2 }} />}
+        <img
+          src={item.gambar}
+          alt={item.nama}
+          onLoad={() => setIsLoaded(true)}
+          style={{ 
+            width: "100%", 
+            height: "100%", 
+            objectFit: "cover",
+            opacity: isLoaded ? 1 : 0,
+            transition: "opacity 0.4s ease-in-out"
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: "18px",
+            left: "18px",
+            background: "#800000",
+            color: "#fff",
+            padding: "10px 16px",
+            borderRadius: "30px",
+            fontSize: "13px",
+            fontWeight: "700",
+            zIndex: 3
+          }}
+        >
+          {item.kategori}
+        </div>
+      </div>
+
+      <div style={{ padding: "24px" }}>
+        <h2 style={{ marginBottom: "12px", fontSize: isMobile ? "20px" : "26px" }}>
+          {item.nama}
+        </h2>
+        <p style={{ color: "#666", lineHeight: "1.8", marginBottom: "18px" }}>
+          {item.deskripsiSingkat?.slice(0, 120)}...
+        </p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontWeight: "700" }}>📍 {item.kabupaten}</span>
+          <span style={{ color: "#800000", fontWeight: "800" }}>Detail →</span>
+        </div>
+      </div>
+    </div>
+  );
+};
